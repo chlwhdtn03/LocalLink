@@ -2,8 +2,9 @@ package notedata;
 
 import beat.chlwhdtn.Beat;
 
-public class Sunrise {
-	public static Beat[] loadBeats(int startTime, int gap) {
+public class Sunrise implements BeatListener{
+	@Override
+	public Beat[] getNotes(int startTime, int gap) {
 		return new Beat[] { new Beat(3030 - startTime - gap, "D"), new Beat(3560 - startTime - gap, "F"),
 				new Beat(4480 - startTime - gap, "S"), new Beat(4630 - startTime - gap, "D"),
 				new Beat(4750 - startTime - gap, "F"), new Beat(5130 - startTime - gap, "D"),

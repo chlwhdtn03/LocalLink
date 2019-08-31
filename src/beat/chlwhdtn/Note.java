@@ -1,18 +1,23 @@
 package beat.chlwhdtn;
 
+import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Image;
-
+import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
+
+import beat.Main;
 
 public class Note extends Thread {
 	private Image noteBasicImage = (new ImageIcon(beat.Main.class.getResource("../images/noteBasic.png"))).getImage();
 	private int x;
-	private int y = -150;
+	private int y = 450 - (1000 / Main.SLEEP_TIME * Main.NOTE_SPEED) * Main.REACH_TIME ;
 
 	public String noteType;
 
 	public boolean proceeded = true;
+	public boolean islong = false;
 
 	public void close() {
 		proceeded = false;
@@ -39,6 +44,19 @@ public class Note extends Thread {
 		this.noteType = noteType;
 	}
 
+	public void setLong(boolean bool) {
+		this.islong = bool;
+		if (bool) {
+			BufferedImage bi = Main.toBufferedImage(noteBasicImage);
+			Graphics2D g = bi.createGraphics();
+			g.setColor(new Color(255, 255, 0));
+			g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
+			noteBasicImage = bi;
+		} else {
+			noteBasicImage = (new ImageIcon(beat.Main.class.getResource("../images/noteBasic.png"))).getImage();
+		}
+	}
+
 	public void screenDraw(Graphics g) {
 		if (noteType.equals("long")) {
 			g.drawImage(noteBasicImage, x, y, null);
@@ -49,9 +67,9 @@ public class Note extends Thread {
 	}
 
 	public void drop() {
-		y += 3;
+		y += Main.NOTE_SPEED;
 		if (y > 500) {
-			JavaBeat.game.judge = "MISS!";
+			JavaBeat.game.JudgeImage = JavaBeat.game.MissImage;
 			JavaBeat.game.combo = 0;
 			close();
 		}
@@ -62,12 +80,12 @@ public class Note extends Thread {
 			while (true) {
 				drop();
 				if (proceeded) {
-					Thread.sleep(10L);
-					continue;
+					Thread.sleep(Main.SLEEP_TIME);
+				} else {
+					interrupt();
+					break;
 				}
-				break;
 			}
-			interrupt();
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -77,24 +95,24 @@ public class Note extends Thread {
 	public String judge() {
 		if (y >= 530) {
 			close();
-			return "MISS!";
+			return "MISS";
 		}
 		if (y >= 480) {
 			close();
-			return "GOOD!";
+			return "GOOD";
 		}
 		if (y >= 400) {
 			close();
-			return "PERFECT!";
+			return "PERFECT";
 		}
 		if (y >= 380) {
 			close();
-			return "GOOD!";
+			return "GOOD";
 		}
 		if (y >= 0) {
 			close();
-			return "EARLY!";
+			return "EARLY";
 		}
-		return "MISS!";
+		return "MISS";
 	}
 }

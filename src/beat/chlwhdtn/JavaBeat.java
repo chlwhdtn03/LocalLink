@@ -15,12 +15,12 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
-
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import beat.Delay;
 import beat.Main;
 
 public class JavaBeat extends JFrame {
@@ -53,18 +53,23 @@ public class JavaBeat extends JFrame {
 
 	private boolean isMainScreen = false;
 	private boolean isGameScreen = false;
+	
+	int fps = 144;
+	Delay delay = new Delay(fps);
 
 	public JavaBeat() {
-
+		
+		delay.setSyncDelay(true);
+		
 		close_exit = new ImageIcon(Main.class.getResource("/Close_Exit.png"));
 		close_enter = new ImageIcon(Main.class.getResource("/Close_Enter.png"));
 
 		min_exit = new ImageIcon(Main.class.getResource("/Min_Exit.png"));
 		min_enter = new ImageIcon(Main.class.getResource("/Min_Enter.png"));
 
+		tracklist.add(new Track("지나고도같은오늘", "지나고도같은오늘.mp3"));
 		tracklist.add(new Track("해야", "해야.mp3"));
 		tracklist.add(new Track("플라워", "플라워.mp3"));
-		tracklist.add(new Track("지나고도같은오늘", "지나고도같은오늘.mp3"));
 
 		setUndecorated(true);
 		setTitle("JavaBeat");
@@ -271,8 +276,7 @@ public class JavaBeat extends JFrame {
 	}
 
 	public void endGame() {
-		JavaBeat.game.close();
-		selectTrack(0);
+		isMainScreen = true;
 		startButton.setVisible(false);
 		exitButton.setVisible(false);
 		nextButton.setVisible(true);
@@ -281,9 +285,9 @@ public class JavaBeat extends JFrame {
 		playButton.setVisible(true);
 		songinfo.setVisible(true);
 		artwork.setVisible(true);
-		isMainScreen = true;
-		isGameScreen = false;
 		selectTrack(nowSelected);
+		isGameScreen = false;
+		JavaBeat.game.close();
 
 	}
 
@@ -299,22 +303,29 @@ public class JavaBeat extends JFrame {
 		isMainScreen = true;
 	}
 
+	
+	
 	public void paint(Graphics g) {
 		screenImage = createImage(Main.WIDTH, Main.HEIGHT);
 		screenGraphic = screenImage.getGraphics();
 		screenDraw((Graphics2D) screenGraphic);
 		g.drawImage(screenImage, 0, 0, null);
+		try {
+			delay.autoCompute();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void screenDraw(Graphics2D g) {
 		if (isMainScreen) {
 			g.drawImage(tracklist.get(nowSelected).image, 0, -100,null);
 			g.drawImage(Background,0,0,800,30,null);
-			g.drawImage(Background, 150, 70, 500,400, null);
+			g.drawImage(Background, 150, 70, 500,500	, null);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(new Font("맑은 고딕", 0, 20));
 			g.setColor(Color.white);
-			g.drawString("JavaBeat", 10, 22);
+			g.drawString("JavaBeat", 350, 22);
 		}
 		if (isGameScreen) {
 			game.screenDraw(g);
