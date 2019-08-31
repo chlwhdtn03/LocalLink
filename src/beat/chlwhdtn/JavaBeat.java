@@ -1,18 +1,27 @@
 package beat.chlwhdtn;
 
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import beat.Main;
 
 public class JavaBeat extends JFrame {
 	private Image screenImage;
@@ -20,8 +29,19 @@ public class JavaBeat extends JFrame {
 	private Image Background;
 	private JButton exitButton = new JButton("나가기");
 	private JButton startButton = new JButton("시작하기");
-	private JButton nextButton = new JButton(">>"); 
+	private JButton nextButton = new JButton(">>");
 	private JButton backButton = new JButton("<<");
+	
+
+	private JButton btnX = new JButton();
+	private JButton btnM = new JButton();
+
+	private ImageIcon min_exit, min_enter;
+	private ImageIcon close_exit, close_enter;
+	private Point mouseDownCompCoords = null;
+
+	private JLabel artwork = new JLabel("이미지");
+	private JLabel songinfo = new JLabel("곡이름");
 
 	ArrayList<Track> tracklist = new ArrayList<Track>();
 	public static Game game;
@@ -30,27 +50,102 @@ public class JavaBeat extends JFrame {
 
 	private JButton playButton = new JButton("시작");
 	private JButton endButton = new JButton("←");
-	
+
 	private boolean isMainScreen = false;
 	private boolean isGameScreen = false;
 
-
 	public JavaBeat() {
 
-		tracklist.add(new Track("해야", "해야.mp3"));
-		tracklist.add(new Track("Flower", "플라워.mp3"));
-		tracklist.add(new Track("지나고도 같은 오늘", "지나고도같은오늘.mp3"));
+		close_exit = new ImageIcon(Main.class.getResource("/Close_Exit.png"));
+		close_enter = new ImageIcon(Main.class.getResource("/Close_Enter.png"));
 
-		setTitle("JavaBeat ");
-		setSize(800, 600);
+		min_exit = new ImageIcon(Main.class.getResource("/Min_Exit.png"));
+		min_enter = new ImageIcon(Main.class.getResource("/Min_Enter.png"));
+
+		tracklist.add(new Track("해야", "해야.mp3"));
+		tracklist.add(new Track("플라워", "플라워.mp3"));
+		tracklist.add(new Track("지나고도같은오늘", "지나고도같은오늘.mp3"));
+
+		setUndecorated(true);
+		setTitle("JavaBeat");
+		setSize(Main.WIDTH, Main.HEIGHT);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(3);
 		setVisible(true);
+		setBackground(new Color(0, 0, 0, 0));
 		setLayout(null);
-		setBackground(new Color(255, 255, 255));
 		setFocusable(true);
 		requestFocusInWindow();
+
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				mouseDownCompCoords = e.getPoint();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				mouseDownCompCoords = null;
+			}
+		});
+		addMouseMotionListener(new MouseMotionAdapter() {
+			@Override
+			public void mouseDragged(MouseEvent e) {
+				Point currCoords = e.getLocationOnScreen();
+				setLocation(currCoords.x - mouseDownCompCoords.x, currCoords.y - mouseDownCompCoords.y);
+			}
+		});
+		
+		btnX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnX.setBorder(null);
+		btnX.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnX.setIcon(close_enter);
+			}
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnX.setIcon(close_exit);
+			}
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				System.exit(0);
+			}
+		});
+		btnX.setOpaque(false);
+		btnX.setContentAreaFilled(false);
+		btnX.setBorderPainted(false);
+		btnX.setIcon(close_exit);
+		btnX.setBounds(770, 0, 30, 30);
+		add(btnX);
+
+		btnM.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+		btnM.setBorder(null);
+		btnM.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				btnM.setIcon(min_enter);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				btnM.setIcon(min_exit);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				setState(JFrame.ICONIFIED);
+			}
+		});
+		btnM.setOpaque(false);
+		btnM.setContentAreaFilled(false);
+		btnM.setBorderPainted(false);
+		btnM.setIcon(min_exit);
+		btnM.setBounds(740, 0, 30, 30);
+		
+		add(btnM);
+
 
 		addKeyListener(new GameKeyListener());
 
@@ -64,13 +159,7 @@ public class JavaBeat extends JFrame {
 		startButton.setBackground(SystemColor.textHighlight);
 		startButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				selectTrack(0);
-				startButton.setVisible(false);
-				exitButton.setVisible(false);
-				nextButton.setVisible(true);
-				backButton.setVisible(true);
-				playButton.setVisible(true);
-				isMainScreen = true;
+				gotoMenu();
 			}
 		});
 		add(startButton);
@@ -106,7 +195,7 @@ public class JavaBeat extends JFrame {
 		});
 		add(nextButton);
 
-		backButton.setBounds(30, 200, 100, 50);
+		backButton.setBounds(40, 200, 100, 50);
 		backButton.setForeground(Color.WHITE);
 		backButton.setFont(new Font("맑은 고딕", 0, 16));
 		backButton.setBorderPainted(false);
@@ -133,10 +222,7 @@ public class JavaBeat extends JFrame {
 		playButton.setBackground(SystemColor.textHighlight);
 		playButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JavaBeat.game = new Game(tracklist.get(nowSelected).title, tracklist.get(nowSelected).gamemusic);
-				JavaBeat.game.start();
-				gameStart(nowSelected);
-				endButton.setVisible(true);
+				startGame();
 			}
 		});
 		add(playButton);
@@ -153,36 +239,82 @@ public class JavaBeat extends JFrame {
 		endButton.setBackground(SystemColor.RED);
 		endButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				JavaBeat.game.close();
-				selectTrack(0);
-				startButton.setVisible(false);
-				exitButton.setVisible(false);
-			nextButton.setVisible(true);
-				backButton.setVisible(true);
-				endButton.setVisible(false);
-				playButton.setVisible(true);
-				isMainScreen = true;
-				isGameScreen = false;
-				selectTrack(nowSelected);
+				endGame();
 			}
 		});
 		add(endButton);
 
-		Background = (new ImageIcon(beat.Main.class.getResource("../images/main.png"))).getImage();
+		songinfo.setBounds(150, 100, 500, 50);
+		songinfo.setForeground(Color.WHITE);
+		songinfo.setFont(new Font("맑은 고딕",  Font.BOLD, 20));
+		songinfo.setVisible(false);
+		songinfo.setHorizontalAlignment(JLabel.CENTER);
+		songinfo.setVerticalAlignment(JLabel.CENTER);
+		add(songinfo);
+
+		artwork.setBounds(275, 200, 250, 250);
+		artwork.setForeground(Color.WHITE);
+		artwork.setFont(new Font("맑은 고딕", Font.BOLD, 20));
+		artwork.setVisible(false);
+		add(artwork);
+
+		Background = (new ImageIcon(Main.class.getResource("../images/background.png"))).getImage();
+	}
+
+	public void startGame() {
+		JavaBeat.game = new Game(tracklist.get(nowSelected));
+		JavaBeat.game.start();
+		gameStart(nowSelected);
+		endButton.setVisible(true);
+		songinfo.setVisible(false);
+		artwork.setVisible(false);
+	}
+
+	public void endGame() {
+		JavaBeat.game.close();
+		selectTrack(0);
+		startButton.setVisible(false);
+		exitButton.setVisible(false);
+		nextButton.setVisible(true);
+		backButton.setVisible(true);
+		endButton.setVisible(false);
+		playButton.setVisible(true);
+		songinfo.setVisible(true);
+		artwork.setVisible(true);
+		isMainScreen = true;
+		isGameScreen = false;
+		selectTrack(nowSelected);
+
+	}
+
+	public void gotoMenu() {
+		selectTrack(0);
+		startButton.setVisible(false);
+		exitButton.setVisible(false);
+		nextButton.setVisible(true);
+		backButton.setVisible(true);
+		playButton.setVisible(true);
+		songinfo.setVisible(true);
+		artwork.setVisible(true);
+		isMainScreen = true;
 	}
 
 	public void paint(Graphics g) {
-		screenImage = createImage(800, 600);
+		screenImage = createImage(Main.WIDTH, Main.HEIGHT);
 		screenGraphic = screenImage.getGraphics();
 		screenDraw((Graphics2D) screenGraphic);
 		g.drawImage(screenImage, 0, 0, null);
 	}
 
-
 	public void screenDraw(Graphics2D g) {
-		paintComponents(g);
 		if (isMainScreen) {
-			g.drawImage(Background, 0, 0, null);
+			g.drawImage(tracklist.get(nowSelected).image, 0, -100,null);
+			g.drawImage(Background,0,0,800,30,null);
+			g.drawImage(Background, 150, 70, 500,400, null);
+			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			g.setFont(new Font("맑은 고딕", 0, 20));
+			g.setColor(Color.white);
+			g.drawString("JavaBeat", 10, 22);
 		}
 		if (isGameScreen) {
 			game.screenDraw(g);
@@ -192,14 +324,19 @@ public class JavaBeat extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		repaint();
+		paintComponents(g);
+		this.repaint();
 	}
 
 	public void selectTrack(int nowSelected) {
 		if (selectedMusic != null) {
 			selectedMusic.close();
 		}
-		selectedMusic = new Music(((Track) tracklist.get(nowSelected)).gamemusic, true);
+		songinfo.setText("<html><center>" + tracklist.get(nowSelected).artist + " - " + tracklist.get(nowSelected).title
+				+ "<br>" + tracklist.get(nowSelected).album + "</center></html>");
+		artwork.setIcon(new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
+				tracklist.get(nowSelected).title));
+		selectedMusic = new Music(tracklist.get(nowSelected).musicuri, true);
 		selectedMusic.start();
 	}
 

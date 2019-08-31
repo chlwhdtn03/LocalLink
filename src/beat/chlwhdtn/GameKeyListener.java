@@ -22,7 +22,6 @@ public class GameKeyListener extends KeyAdapter
 	    } else if (e.getKeyCode() == KeyEvent.VK_L) {
 	      JavaBeat.game.pressL();
 	    } 
-	    
 	    System.out.println("new Beat(" + JavaBeat.game.gameMusic.getTime() + " - startTime - gap, \"" + (new String((new StringBuilder(String.valueOf(e.getKeyChar()))).toString())).toUpperCase() + "\"),");
 	  }
 

@@ -95,6 +95,6 @@ public class Note extends Thread {
 			close();
 			return "EARLY!";
 		}
-		return "GOOD!";
+		return "MISS!";
 	}
 }

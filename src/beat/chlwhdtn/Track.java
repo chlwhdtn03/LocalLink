@@ -1,11 +1,47 @@
 package beat.chlwhdtn;
 
-public class Track {
-	public String gamemusic;
-	public String title;
+import java.awt.Image;
+import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
-	public Track(String title, String gamemusic) {
-		this.gamemusic = gamemusic;
-		this.title = title;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
+
+import beat.Main;
+
+public class Track {
+	public String musicuri;
+	public String id;
+	public String title;
+	public Image image;
+	public String artist;
+	public String album;
+
+	public Track(String id, String gamemusic) {
+		try {
+			this.id = id;
+			this.musicuri = gamemusic;
+			AudioFile audioFile = AudioFileIO.read(new File(Main.class.getResource("../music/"+gamemusic).toURI()));
+			Tag tag = audioFile.getTag();
+			this.title = tag.getFirst(FieldKey.TITLE);
+			this.artist = tag.getFirst(FieldKey.ARTIST);
+			this.album = tag.getFirst(FieldKey.ALBUM);
+			if(this.title.isEmpty() || this.title == null) {
+				title = id;
+			}
+			this.image = (Image) tag.getFirstArtwork().getImage();
+			this.image = this.image.getScaledInstance(800, 800, Image.SCALE_SMOOTH);
+		} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
+				| InvalidAudioFrameException | URISyntaxException e) {
+			e.printStackTrace();
+		}
 	}
+	
 }
