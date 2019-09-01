@@ -167,7 +167,6 @@ public class Game extends Thread {
 
 	public void close() {
 		notelist.clear();
-		System.out.println("노래끝");
 		gameMusic.close();
 		interrupt();
 	}

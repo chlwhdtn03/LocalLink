@@ -454,7 +454,6 @@ public class JavaBeat extends JFrame {
 		if (selectedMusic != null) {
 			selectedMusic.close();
 		}
-		System.out.println(tracklist.get(nowSelected).duration);
 		songinfo.setText("<html><center>" + tracklist.get(nowSelected).artist + " - " + tracklist.get(nowSelected).title
 				+ "<br>" + tracklist.get(nowSelected).album + "<br>"+Timer.getTime(tracklist.get(nowSelected).duration)+"</center></html>");
 		artwork.setIcon(new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
