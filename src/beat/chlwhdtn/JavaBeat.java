@@ -206,9 +206,8 @@ public class JavaBeat extends JFrame {
 		nextButton.setContentAreaFilled(false);
 		nextButton.setFocusPainted(false);
 		nextButton.setOpaque(true);
-		nextButton.setBorderPainted(true);
-		nextButton.setBackground(new Color(0, 0, 0, 50));
-		nextButton.setBorder(new LineBorder(SystemColor.black));
+		nextButton.setBorderPainted(false);
+		nextButton.setBackground(new Color(0, 0, 0, 100));
 		nextButton.setVisible(false);
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -223,9 +222,8 @@ public class JavaBeat extends JFrame {
 		backButton.setContentAreaFilled(false);
 		backButton.setFocusPainted(false);
 		backButton.setOpaque(true);
-		backButton.setBorderPainted(true);
-		backButton.setBackground(new Color(0,0,0,50));
-		backButton.setBorder(new LineBorder(SystemColor.black));
+		backButton.setBorderPainted(false);
+		backButton.setBackground(new Color(0,0,0,100));
 		backButton.setVisible(false);
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -240,9 +238,8 @@ public class JavaBeat extends JFrame {
 		playButton.setContentAreaFilled(false);
 		playButton.setFocusPainted(false);
 		playButton.setOpaque(true);
-		playButton.setBorderPainted(true);
-		playButton.setBackground(new Color(255, 255, 255, 50));
-		playButton.setBorder(new LineBorder(SystemColor.white));
+		playButton.setBorderPainted(false);
+		playButton.setBackground(new Color(255, 255, 255, 100));
 		playButton.setVisible(false);
 		playButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -444,6 +441,11 @@ public class JavaBeat extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		g.setColor(Color.white);
+		g.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
+		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g.drawString(Long.toString(Main.MEMORY_USAGE / 1024 / 1024) + " MB", 660, 24);
+		
 		paintComponents(g);
 		this.repaint();
 	}

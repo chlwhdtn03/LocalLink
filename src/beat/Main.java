@@ -12,8 +12,24 @@ public class Main {
 	public static final int NOTE_SPEED = 3;
 	public static final int SLEEP_TIME = 10;
 	public static final int REACH_TIME = 2;
+	public static long MEMORY_USAGE = 0;
 
 	public static void main(String[] args) {
+		Thread utilThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {		
+					while(true) {
+						MEMORY_USAGE = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+						Delay.sleep(5000);
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		utilThread.setName("유틸 쓰레드");
+		utilThread.start();
 		new JavaBeat();
 	}
 	
