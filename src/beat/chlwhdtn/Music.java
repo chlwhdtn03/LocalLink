@@ -18,6 +18,7 @@ public class Music extends Thread {
 
 	public Music(String name, boolean isrun) {
 		try {
+			setName(name + " 재생 쓰레드");
 			this.isrun = isrun;
 			this.name = name;
 			is = Main.class.getResourceAsStream("/music/"+name);
