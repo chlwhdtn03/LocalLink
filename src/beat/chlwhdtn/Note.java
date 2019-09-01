@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import beat.Main;
 
 public class Note extends Thread {
-	private Image noteBasicImage = (new ImageIcon(beat.Main.class.getResource("../images/noteBasic.png"))).getImage();
+	private Image noteBasicImage = (new ImageIcon(beat.Main.class.getResource("/images/noteBasic.png"))).getImage();
 	private int x;
 	private int y = 450 - (1000 / Main.SLEEP_TIME * Main.NOTE_SPEED) * Main.REACH_TIME ;
 
@@ -24,6 +24,7 @@ public class Note extends Thread {
 	}
 
 	public Note(String noteType) {
+		setName(noteType + " 노트");
 		if (noteType.equals("S")) {
 			x = 80;
 		} else if (noteType.equals("D")) {
@@ -53,7 +54,7 @@ public class Note extends Thread {
 			g.fillRect(0, 0, bi.getWidth(), bi.getHeight());
 			noteBasicImage = bi;
 		} else {
-			noteBasicImage = (new ImageIcon(beat.Main.class.getResource("../images/noteBasic.png"))).getImage();
+			noteBasicImage = (new ImageIcon(beat.Main.class.getResource("/images/noteBasic.png"))).getImage();
 		}
 	}
 
@@ -69,8 +70,10 @@ public class Note extends Thread {
 	public void drop() {
 		y += Main.NOTE_SPEED;
 		if (y > 500) {
-			JavaBeat.game.JudgeImage = JavaBeat.game.MissImage;
-			JavaBeat.game.combo = 0;
+			if(JavaBeat.game != null) {
+				JavaBeat.game.JudgeImage = JavaBeat.game.MissImage;
+				JavaBeat.game.combo = 0;
+			}
 			close();
 		}
 	}

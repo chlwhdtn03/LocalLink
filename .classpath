@@ -5,5 +5,6 @@
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/jl1.0.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/resource.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/commons-io-2.6.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

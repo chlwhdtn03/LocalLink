@@ -2,11 +2,13 @@ package beat.chlwhdtn;
 
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -19,9 +21,19 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JScrollBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.UIManager;
+import javax.swing.border.LineBorder;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.ScrollBarUI;
+import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import beat.Delay;
 import beat.Main;
+import beat.Timer;
 
 public class JavaBeat extends JFrame {
 	private Image screenImage;
@@ -32,6 +44,7 @@ public class JavaBeat extends JFrame {
 	private JButton nextButton = new JButton(">>");
 	private JButton backButton = new JButton("<<");
 	
+	private JButton showlyricButton = new JButton("가사");
 
 	private JButton btnX = new JButton();
 	private JButton btnM = new JButton();
@@ -42,6 +55,8 @@ public class JavaBeat extends JFrame {
 
 	private JLabel artwork = new JLabel("이미지");
 	private JLabel songinfo = new JLabel("곡이름");
+	private JTextArea lyric = new JTextArea();
+	private JScrollPane scroll = new JScrollPane(lyric);
 
 	ArrayList<Track> tracklist = new ArrayList<Track>();
 	public static Game game;
@@ -54,6 +69,8 @@ public class JavaBeat extends JFrame {
 	private boolean isMainScreen = false;
 	private boolean isGameScreen = false;
 	
+	private Thread gameThread;
+	private boolean lyricmode = false;
 	int fps = 144;
 	Delay delay = new Delay(fps);
 
@@ -68,6 +85,7 @@ public class JavaBeat extends JFrame {
 		min_enter = new ImageIcon(Main.class.getResource("/Min_Enter.png"));
 
 		tracklist.add(new Track("지나고도같은오늘", "지나고도같은오늘.mp3"));
+		tracklist.add(new Track("그냥냅둬", "임창정-그냥 냅둬 (Inst.).mp3"));
 		tracklist.add(new Track("해야", "해야.mp3"));
 		tracklist.add(new Track("플라워", "플라워.mp3"));
 
@@ -80,8 +98,6 @@ public class JavaBeat extends JFrame {
 		setVisible(true);
 		setBackground(new Color(0, 0, 0, 0));
 		setLayout(null);
-		setFocusable(true);
-		requestFocusInWindow();
 
 		addMouseListener(new MouseAdapter() {
 			@Override
@@ -184,15 +200,16 @@ public class JavaBeat extends JFrame {
 		});
 		add(exitButton);
 
-		nextButton.setBounds(660, 200, 100, 50);
+		nextButton.setBounds(500, 500, 100, 50);
 		nextButton.setForeground(Color.WHITE);
 		nextButton.setFont(new Font("맑은 고딕", 0, 16));
-		nextButton.setBorderPainted(false);
 		nextButton.setContentAreaFilled(false);
 		nextButton.setFocusPainted(false);
 		nextButton.setOpaque(true);
+		nextButton.setBorderPainted(true);
+		nextButton.setBackground(new Color(0, 0, 0, 50));
+		nextButton.setBorder(new LineBorder(SystemColor.black));
 		nextButton.setVisible(false);
-		nextButton.setBackground(SystemColor.textHighlight);
 		nextButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectRight();
@@ -200,15 +217,16 @@ public class JavaBeat extends JFrame {
 		});
 		add(nextButton);
 
-		backButton.setBounds(40, 200, 100, 50);
+		backButton.setBounds(200, 500, 100, 50);
 		backButton.setForeground(Color.WHITE);
 		backButton.setFont(new Font("맑은 고딕", 0, 16));
-		backButton.setBorderPainted(false);
 		backButton.setContentAreaFilled(false);
 		backButton.setFocusPainted(false);
 		backButton.setOpaque(true);
+		backButton.setBorderPainted(true);
+		backButton.setBackground(new Color(0,0,0,50));
+		backButton.setBorder(new LineBorder(SystemColor.black));
 		backButton.setVisible(false);
-		backButton.setBackground(SystemColor.textHighlight);
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				selectLeft();
@@ -219,12 +237,13 @@ public class JavaBeat extends JFrame {
 		playButton.setBounds(350, 500, 100, 50);
 		playButton.setForeground(Color.WHITE);
 		playButton.setFont(new Font("맑은 고딕", 0, 16));
-		playButton.setBorderPainted(false);
 		playButton.setContentAreaFilled(false);
 		playButton.setFocusPainted(false);
 		playButton.setOpaque(true);
+		playButton.setBorderPainted(true);
+		playButton.setBackground(new Color(255, 255, 255, 50));
+		playButton.setBorder(new LineBorder(SystemColor.white));
 		playButton.setVisible(false);
-		playButton.setBackground(SystemColor.textHighlight);
 		playButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				startGame();
@@ -248,8 +267,26 @@ public class JavaBeat extends JFrame {
 			}
 		});
 		add(endButton);
+		
+		showlyricButton.setBounds(600, 70, 50, 25);
+		showlyricButton.setForeground(Color.WHITE);
+		showlyricButton.setFont(new Font("맑은 고딕", 0, 16));
+		showlyricButton.setContentAreaFilled(false);
+		showlyricButton.setFocusPainted(false);
+		showlyricButton.setOpaque(true);
+		showlyricButton.setBorderPainted(true);
+		showlyricButton.setBackground(new Color(0, 0, 0, 0));
+		showlyricButton.setBorder(new LineBorder(Color.white));
+		showlyricButton.setVisible(false);
+		showlyricButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				lyricmode = !lyricmode;
+				checklyric();
+			}
+		});
+		add(showlyricButton);
 
-		songinfo.setBounds(150, 100, 500, 50);
+		songinfo.setBounds(150, 100, 500, 100);
 		songinfo.setForeground(Color.WHITE);
 		songinfo.setFont(new Font("맑은 고딕",  Font.BOLD, 20));
 		songinfo.setVisible(false);
@@ -262,48 +299,120 @@ public class JavaBeat extends JFrame {
 		artwork.setFont(new Font("맑은 고딕", Font.BOLD, 20));
 		artwork.setVisible(false);
 		add(artwork);
+		
+		scroll.setBounds(175, 200, 450, 250);
+		scroll.setVisible(false);
+		scroll.setBackground(new Color(0, 0, 0, 0));
+		
+		scroll.setBorder(null);		
+		scroll.getVerticalScrollBar().setUnitIncrement(7);
+		scroll.getVerticalScrollBar().setBackground(new Color(0,0,0,100));
+		scroll.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+			
+			@Override
+			protected JButton createDecreaseButton(int orientation) {
+				return createZeroButton();
+			}
+			
+			@Override    
+	        protected JButton createIncreaseButton(int orientation) {
+	            return createZeroButton();
+	        }
+			
+			@Override
+			protected void configureScrollBarColors() {
+				this.thumbColor = new Color(200,200,200,50);  
+				this.minimumThumbSize = new Dimension(0,50);
+				this.maximumThumbSize = new Dimension(0,50);
+				this.thumbDarkShadowColor = new Color(200,200,200);
+			}
+			
+			
 
-		Background = (new ImageIcon(Main.class.getResource("../images/background.png"))).getImage();
+	        private JButton createZeroButton() {
+	            JButton jbutton = new JButton();
+	            jbutton.setPreferredSize(new Dimension(0, 0));
+	            jbutton.setMinimumSize(new Dimension(0, 0));
+	            jbutton.setMaximumSize(new Dimension(0, 0));
+	            return jbutton;
+	        }
+
+		});
+		lyric.setBackground(new Color(0, 0, 0, 0));
+		lyric.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+		lyric.setForeground(Color.white);
+		lyric.setEditable(false);
+		add(scroll);
+
+		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
 	}
 
-	public void startGame() {
-		JavaBeat.game = new Game(tracklist.get(nowSelected));
-		JavaBeat.game.start();
-		gameStart(nowSelected);
-		endButton.setVisible(true);
-		songinfo.setVisible(false);
-		artwork.setVisible(false);
-	}
-
-	public void endGame() {
-		isMainScreen = true;
-		startButton.setVisible(false);
-		exitButton.setVisible(false);
-		nextButton.setVisible(true);
-		backButton.setVisible(true);
-		endButton.setVisible(false);
-		playButton.setVisible(true);
-		songinfo.setVisible(true);
-		artwork.setVisible(true);
-		selectTrack(nowSelected);
-		isGameScreen = false;
-		JavaBeat.game.close();
-
+	public void startGame() {	
+		gameThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					game = new Game(tracklist.get(nowSelected));
+					game.start();
+					setFocusable(true);
+					gameStart(nowSelected);
+					game.join();
+					endGame();
+				} catch (InterruptedException e) {
+					game.interrupt();
+					e.printStackTrace();
+				}
+			}
+		});
+		gameThread.setName("게임 종료 대기 쓰레드");
+		gameThread.start();
 	}
 
 	public void gotoMenu() {
-		selectTrack(0);
+		selectTrack(nowSelected);
 		startButton.setVisible(false);
 		exitButton.setVisible(false);
+		endButton.setVisible(false);
 		nextButton.setVisible(true);
 		backButton.setVisible(true);
 		playButton.setVisible(true);
 		songinfo.setVisible(true);
 		artwork.setVisible(true);
+		showlyricButton.setVisible(true);
 		isMainScreen = true;
 	}
-
 	
+	public void checklyric() {
+		artwork.setVisible(!lyricmode);
+		scroll.setVisible(lyricmode);
+	}
+	
+	public void gameStart(int nowSelected) {
+		if (selectedMusic != null)
+			selectedMusic.close();
+		isGameScreen = true;
+		isMainScreen = false;
+		nextButton.setVisible(false);
+		backButton.setVisible(false);
+		playButton.setVisible(false);
+		showlyricButton.setVisible(false);
+		scroll.setVisible(false);
+		endButton.setVisible(true);
+		songinfo.setVisible(false);
+		artwork.setVisible(false);
+		showlyricButton.setVisible(false);
+	}
+	
+	public void endGame() {
+		gameThread.interrupt();
+		JavaBeat.game.close();
+		game = null;
+		isGameScreen = false;
+		gotoMenu();
+		lyricmode = false;
+		checklyric();
+
+	}
 	
 	public void paint(Graphics g) {
 		screenImage = createImage(Main.WIDTH, Main.HEIGHT);
@@ -343,10 +452,16 @@ public class JavaBeat extends JFrame {
 		if (selectedMusic != null) {
 			selectedMusic.close();
 		}
+		System.out.println(tracklist.get(nowSelected).duration);
 		songinfo.setText("<html><center>" + tracklist.get(nowSelected).artist + " - " + tracklist.get(nowSelected).title
-				+ "<br>" + tracklist.get(nowSelected).album + "</center></html>");
+				+ "<br>" + tracklist.get(nowSelected).album + "<br>"+Timer.getTime(tracklist.get(nowSelected).duration)+"</center></html>");
 		artwork.setIcon(new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
 				tracklist.get(nowSelected).title));
+		lyric.setText(tracklist.get(nowSelected).lyric);
+		if(tracklist.get(nowSelected).title.toLowerCase().contains("(inst.)")) {
+			lyric.setText("Instrumental 음원입니다");
+		}
+		lyric.setCaretPosition(0);
 		selectedMusic = new Music(tracklist.get(nowSelected).musicuri, true);
 		selectedMusic.start();
 	}
@@ -369,13 +484,5 @@ public class JavaBeat extends JFrame {
 		selectTrack(nowSelected);
 	}
 
-	public void gameStart(int nowSelected) {
-		if (selectedMusic != null)
-			selectedMusic.close();
-		isGameScreen = true;
-		isMainScreen = false;
-		nextButton.setVisible(false);
-		backButton.setVisible(false);
-		playButton.setVisible(false);
-	}
+	
 }
