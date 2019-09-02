@@ -339,6 +339,8 @@ public class JavaBeat extends JFrame {
 		lyric.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
 		lyric.setForeground(Color.white);
 		lyric.setEditable(false);
+		lyric.setSelectionColor(new Color(0, 0, 0, 125));
+		lyric.setSelectedTextColor(Color.WHITE);
 		add(scroll);
 
 		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
