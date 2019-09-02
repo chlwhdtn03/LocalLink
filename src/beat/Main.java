@@ -21,7 +21,7 @@ public class Main {
 				try {		
 					while(true) {
 						MEMORY_USAGE = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-						Delay.sleep(5000);
+						Delay.sleep(10000);
 					}
 				} catch (InterruptedException e) {
 					e.printStackTrace();

@@ -21,6 +21,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -55,8 +56,11 @@ public class JavaBeat extends JFrame {
 
 	private JLabel artwork = new JLabel("이미지");
 	private JLabel songinfo = new JLabel("곡이름");
+	private JLabel playtime = new JLabel("0:00");
+	private JLabel nowtime = new JLabel("0:00");
 	private JTextArea lyric = new JTextArea();
 	private JScrollPane scroll = new JScrollPane(lyric);
+	private JProgressBar timebar = new JProgressBar();
 
 	ArrayList<Track> tracklist = new ArrayList<Track>();
 	public static Game game;
@@ -290,6 +294,38 @@ public class JavaBeat extends JFrame {
 		songinfo.setHorizontalAlignment(JLabel.CENTER);
 		songinfo.setVerticalAlignment(JLabel.CENTER);
 		add(songinfo);
+		
+		nowtime.setBounds(200, 455, 50, 20);
+		nowtime.setForeground(Color.WHITE);
+		nowtime.setFont(new Font("맑은 고딕",  Font.PLAIN, 20));
+		nowtime.setHorizontalAlignment(JLabel.CENTER);
+		nowtime.setVerticalAlignment(JLabel.CENTER);
+		nowtime.setVisible(false);
+		add(nowtime);
+		
+		playtime.setBounds(550, 455, 50, 20);
+		playtime.setForeground(Color.WHITE);
+		playtime.setFont(new Font("맑은 고딕",  Font.PLAIN, 20));
+		playtime.setHorizontalAlignment(JLabel.CENTER);
+		playtime.setVerticalAlignment(JLabel.CENTER);
+		playtime.setVisible(false);
+		add(playtime);
+		
+		timebar.setBounds(260,457,280,20);
+		timebar.setOpaque(true);
+		timebar.setBorderPainted(false);
+		timebar.setBackground(new Color(0,0,0,100));
+		timebar.setForeground(new Color(200,200,255,100));
+		timebar.setVisible(false);
+		timebar.addMouseListener(new MouseAdapter() {            
+		    public void mouseClicked(MouseEvent e) {
+		       int mouseX = e.getX();
+		       int progressBarVal = (int)Math.round(((double)mouseX / (double)timebar.getWidth()) * timebar.getMaximum());
+		       timebar.setValue(progressBarVal);
+		  }                                     
+		});
+		add(timebar);
+
 
 		artwork.setBounds(275, 200, 250, 250);
 		artwork.setForeground(Color.WHITE);
@@ -375,9 +411,12 @@ public class JavaBeat extends JFrame {
 		nextButton.setVisible(true);
 		backButton.setVisible(true);
 		playButton.setVisible(true);
+		playtime.setVisible(true);
 		songinfo.setVisible(true);
 		artwork.setVisible(true);
 		showlyricButton.setVisible(true);
+		timebar.setVisible(true);
+		nowtime.setVisible(true);
 		isMainScreen = true;
 	}
 	
@@ -398,7 +437,10 @@ public class JavaBeat extends JFrame {
 		scroll.setVisible(false);
 		endButton.setVisible(true);
 		songinfo.setVisible(false);
+		playtime.setVisible(false);
 		artwork.setVisible(false);
+		timebar.setVisible(false);
+		nowtime.setVisible(false);
 		showlyricButton.setVisible(false);
 	}
 	
@@ -446,9 +488,12 @@ public class JavaBeat extends JFrame {
 		g.setColor(Color.white);
 		g.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-		g.drawString(Long.toString(Main.MEMORY_USAGE / 1024 / 1024) + " MB", 660, 24);
-		
+		g.drawString(Long.toString(Main.MEMORY_USAGE / 1024 / 1024) + " MB", 650, 24);
 		paintComponents(g);
+		if(selectedMusic != null) {
+			nowtime.setText(Timer.getTime(selectedMusic.getTime() / 1000));
+			timebar.setValue(selectedMusic.getTime() / 1000);
+		}
 		this.repaint();
 	}
 
@@ -457,7 +502,11 @@ public class JavaBeat extends JFrame {
 			selectedMusic.close();
 		}
 		songinfo.setText("<html><center>" + tracklist.get(nowSelected).artist + " - " + tracklist.get(nowSelected).title
-				+ "<br>" + tracklist.get(nowSelected).album + "<br>"+Timer.getTime(tracklist.get(nowSelected).duration)+"</center></html>");
+				+ "<br>" + tracklist.get(nowSelected).album + "</center></html>");
+
+		timebar.setValue(0);
+		timebar.setMaximum(tracklist.get(nowSelected).duration);
+		playtime.setText(Timer.getTime(tracklist.get(nowSelected).duration));
 		artwork.setIcon(new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
 				tracklist.get(nowSelected).title));
 		lyric.setText(tracklist.get(nowSelected).lyric);
