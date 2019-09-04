@@ -8,7 +8,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -22,19 +21,15 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.UIManager;
 import javax.swing.border.LineBorder;
-import javax.swing.plaf.ColorUIResource;
-import javax.swing.plaf.ScrollBarUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
 import beat.Delay;
 import beat.Main;
 import beat.Timer;
+import beat.WebManager;
 
 public class JavaBeat extends JFrame {
 	private Image screenImage;
@@ -73,12 +68,18 @@ public class JavaBeat extends JFrame {
 	private boolean isMainScreen = false;
 	private boolean isGameScreen = false;
 	
+	private WebManager wm;
+	
 	private Thread gameThread;
 	private boolean lyricmode = false;
 	int fps = 144;
 	Delay delay = new Delay(fps);
+	
+	public static JavaBeat instance;
 
 	public JavaBeat() {
+		instance = this;
+		
 		
 		delay.setSyncDelay(true);
 		
@@ -184,6 +185,7 @@ public class JavaBeat extends JFrame {
 		startButton.setBackground(SystemColor.textHighlight);
 		startButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				wm = new WebManager();
 				gotoMenu();
 			}
 		});
@@ -380,6 +382,7 @@ public class JavaBeat extends JFrame {
 		add(scroll);
 
 		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
+
 	}
 
 	public void startGame() {	
@@ -501,6 +504,8 @@ public class JavaBeat extends JFrame {
 		if (selectedMusic != null) {
 			selectedMusic.close();
 		}
+		wm.sendTrack(tracklist.get(nowSelected));
+		
 		songinfo.setText("<html><center>" + tracklist.get(nowSelected).artist + " - " + tracklist.get(nowSelected).title
 				+ "<br>" + tracklist.get(nowSelected).album + "</center></html>");
 

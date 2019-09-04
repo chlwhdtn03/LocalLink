@@ -6,5 +6,8 @@
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/resource.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/commons-io-2.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/netty-all-4.1.39.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/vertx-core-3.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/gson-2.8.5.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

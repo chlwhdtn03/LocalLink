@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+
+    <script src=https://code.jquery.com/jquery-2.x-git.js></script>
+    <script>
+        $(
+            function () {
+                webSocket = new WebSocket("ws://" + location.host + "/JavaBeat");
+                webSocket.onopen = function () { 
+                     webSocket.send("connect");
+                    alert("JavaBeat : 연결 성공")
+                 };
+                webSocket.onclose = function () {
+                    alert("JavaBeat : 서버와 연결이 종료되었습니다.")
+                };
+                webSocket.onmessage = function (b) {
+                    var a = JSON.parse(b.data);
+                    switch (a.type) {
+                        case "singer":
+                        $("#singer").text(a.data);
+                        break;
+                        case "title":
+                        $("#title").text(a.data);
+                        break;
+                        case "album":
+                        $("#album").text(a.data);
+                        break;
+                        case "artwork":
+                        $("#artwork").text(a.data);
+                        break;
+                    }
+                }
+            });
+        function nextsong() {
+            // var b = $("#" + a + "_text");
+            // if (b.val().length > 0) {
+                webSocket.send("nextsong");
+            //     b.val("")
+            // }
+        }
+        function backsong() {
+            // var b = $("#" + a + "_text");
+            // if (b.val().length > 0) {
+                webSocket.send("backsong");
+            //     b.val("")
+            // }
+        }
+    </script>
+
+    <style>
+    
+        * {
+            text-align: center;
+        }
+
+        img {
+            display: inline;
+        }
+
+        h1 {
+            display: inline;
+        }
+    
+    </style>
+
+    <meta charset="UTF-8">
+    <title>JavaBeat</title>
+</head>
+<body>
+    <img id="image" title="앨범사진">
+    <h1 id="title">곡 제목</h1>
+    <h2 id="album">앨범</h2>
+    <h3 id="singer">가수</h3>
+    <br>
+    <hr>
+    <button id="back" onclick="backsong()">이전 곡</button>
+    <button id="next" onclick="nextsong()">다음 곡</button>
+</body>
+</html>

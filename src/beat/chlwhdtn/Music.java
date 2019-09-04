@@ -2,7 +2,6 @@ package beat.chlwhdtn;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 
 import beat.Main;
@@ -41,6 +40,7 @@ public class Music extends Thread {
 		player.close();
 		interrupt();
 	}
+	
 
 	public void run() {
 		try {
