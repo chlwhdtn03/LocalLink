@@ -9,7 +9,6 @@
                 webSocket = new WebSocket("ws://" + location.host + "/JavaBeat");
                 webSocket.onopen = function () { 
                      webSocket.send("connect");
-                    alert("JavaBeat : 연결 성공")
                  };
                 webSocket.onclose = function () {
                     alert("JavaBeat : 서버와 연결이 종료되었습니다.")
