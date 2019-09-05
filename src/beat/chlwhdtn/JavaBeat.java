@@ -74,6 +74,7 @@ public class JavaBeat extends JFrame {
 	private boolean lyricmode = false;
 	int fps = 144;
 	Delay delay = new Delay(fps);
+	public Track selectedTrack;
 	
 	public static JavaBeat instance;
 
@@ -519,6 +520,7 @@ public class JavaBeat extends JFrame {
 			lyric.setText("Instrumental 음원입니다");
 		}
 		lyric.setCaretPosition(0);
+		selectedTrack = tracklist.get(nowSelected);
 		selectedMusic = new Music(tracklist.get(nowSelected).musicuri, true);
 		selectedMusic.start();
 	}

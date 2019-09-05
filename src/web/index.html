@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-
-    <script src=https://code.jquery.com/jquery-2.x-git.js></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src=https://code.jquery.com/jquery-2.x-git.js></script> 
     <script>
         $(
             function () {
                 webSocket = new WebSocket("ws://" + location.host + "/JavaBeat");
-                webSocket.onopen = function () { 
-                     webSocket.send("connect");
-                 };
+                webSocket.onopen = function () {
+                    webSocket.send("connect");
+                };
                 webSocket.onclose = function () {
                     alert("JavaBeat : 서버와 연결이 종료되었습니다.")
                 };
@@ -17,31 +17,31 @@
                     var a = JSON.parse(b.data);
                     switch (a.type) {
                         case "singer":
-                        $("#singer").text(a.data);
-                        break;
+                            $("#singer").text(a.data);
+                            break;
                         case "title":
-                        $("#title").text(a.data);
-                        break;
+                            $("#title").text(a.data);
+                            break;
                         case "album":
-                        $("#album").text(a.data);
-                        break;
+                            $("#album").text(a.data);
+                            break;
                         case "artwork":
-                        $("#artwork").text(a.data);
-                        break;
+                            $("#image").attr('src', 'data:image/png;base64,' + a.data);
+                            break;
                     }
                 }
             });
         function nextsong() {
             // var b = $("#" + a + "_text");
             // if (b.val().length > 0) {
-                webSocket.send("nextsong");
+            webSocket.send("nextsong");
             //     b.val("")
             // }
         }
         function backsong() {
             // var b = $("#" + a + "_text");
             // if (b.val().length > 0) {
-                webSocket.send("backsong");
+            webSocket.send("backsong");
             //     b.val("")
             // }
         }
@@ -49,31 +49,45 @@
 
     <style>
     
-        * {
-            text-align: center;
-        }
+    * {
+        text-align: center;
+    }
 
-        img {
-            display: inline;
-        }
+    p {
+        margin-top: 0px;
+    }
 
-        h1 {
-            display: inline;
-        }
+    img {
+        max-width: 400px;
+    }
+
+    button {
+        text-decoration: none;
+        border: none;
+        padding: 5px;
+        display: inline-block;
+        font-size: 15px;
+        margin: 5px;
+        color: white;
+        background-color: #000000;
+        cursor: pointer;
+    }
     
     </style>
-
     <meta charset="UTF-8">
     <title>JavaBeat</title>
 </head>
+
 <body>
-    <img id="image" title="앨범사진">
-    <h1 id="title">곡 제목</h1>
-    <h2 id="album">앨범</h2>
-    <h3 id="singer">가수</h3>
-    <br>
-    <hr>
-    <button id="back" onclick="backsong()">이전 곡</button>
-    <button id="next" onclick="nextsong()">다음 곡</button>
+    <div>
+        <figure>
+            <img id="image" src="" width=100% height=100% onerror="this.src='Noimg.png'">
+            <p><span style="font-size: 1.2rem;" id="title">Title</span><br>
+            <span style="color: blue;"><span id="singer">artist</span> - <span id="album">album</span></span></p>
+        </figure>
+        <button id="back" onclick="backsong()">이전 곡</button>
+        <button id="next" onclick="nextsong()">다음 곡</button>
+    </div>
 </body>
+
 </html>

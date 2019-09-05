@@ -1,8 +1,18 @@
 package beat;
 
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.imageio.ImageIO;
+
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -16,52 +26,58 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
 
 public class WebManager {
-	
-	private HttpServer server;
-	private final List<ServerWebSocket> clients  = new  ArrayList<>();
-	public WebManager() {
-		server = Vertx.vertx().createHttpServer(new HttpServerOptions().setPort(10426)).requestHandler(req -> {
 
-			try(InputStream in = getClass().getResourceAsStream("/web/index.html")) {
+	private HttpServer server;
+	private final List<ServerWebSocket> clients = new ArrayList<>();
+	public int port = 10426;
+
+	public WebManager() {
+		server = Vertx.vertx().createHttpServer(new HttpServerOptions().setPort(port)).requestHandler(req -> {
+
+			try (InputStream in = getClass()
+					.getResourceAsStream("/web" + (req.path().equals("/") ? "/index.html" : req.path()))) {
 				byte[] data = new byte[1024];
 				int size;
 				Buffer buffer = Buffer.factory.buffer();
-				while((size = in.read(data)) != -1) {
+				while ((size = in.read(data)) != -1) {
 					buffer.appendBytes(data, 0, size);
 				}
 				req.response().end(buffer);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				req.response().setStatusCode(404).end();
 			}
 		}).websocketHandler(ws -> {
-			ws.closeHandler( v -> {
-				if(clients.contains(ws)) {
+			ws.closeHandler(v -> {
+				if (clients.contains(ws)) {
 					clients.remove(ws);
-					System.out.println("접속해제");
+					System.out.println(ws.remoteAddress() + "에서 접속이 해제되었습니다.");
 				}
 			});
-			
+
 			ws.frameHandler(frame -> {
-			
+
 				String order = frame.textData();
-				System.out.println(order);
-				if(order.equals("connect")) {
+				System.out.println(ws.remoteAddress() + "에게 " + order + " 수신");
+				if (order.equals("connect")) {
+					// 접속 완료 됬을 경우 // 접속 완료 됬을 경우 // 접속 완료 됬을 경우
 					clients.add(ws);
+					sendTrack(JavaBeat.instance.selectedTrack);
 				}
-				if(order.equals("nextsong")) {
+				if (order.equals("nextsong")) {
 					JavaBeat.instance.selectRight();
 				} else if (order.equals("backsong")) {
 					JavaBeat.instance.selectLeft();
 				}
 			});
-		}).listen(10426, result -> {
-			if(result.succeeded()) {
-				System.out.println("개방 성공");
+		}).listen(port, result -> {
+			if (result.succeeded()) {
+				System.out.println(port + " 포트로 개방 성공");
+
 			} else {
-				System.out.println("개방 실패");
+				System.out.println(port + " 포트로 개방 실패");
 			}
 		});
-		
+
 	}
 
 	public void sendTrack(Track track) {
@@ -74,10 +90,44 @@ public class WebManager {
 		JsonObject signer = new JsonObject();
 		signer.addProperty("type", "singer");
 		signer.addProperty("data", track.artist);
+		JsonObject image = new JsonObject();
+		image.addProperty("type", "artwork");
+		image.addProperty("data", encodeToString(track.image));
 		new ArrayList<>(clients).forEach((client) -> {
 			client.writeFinalTextFrame(title.toString());
 			client.writeFinalTextFrame(album.toString());
 			client.writeFinalTextFrame(signer.toString());
-		}); 
+			client.writeFinalTextFrame(image.toString());
+		});
 	}
+
+	public String encodeToString(Image img) {
+		BufferedImage image;
+		if (img instanceof BufferedImage) {
+			image = (BufferedImage) img;
+		}
+
+		// Create a buffered image with transparency
+		image = new BufferedImage(img.getWidth(null), img.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+		// Draw the image on to the buffered image
+		Graphics2D bGr = image.createGraphics();
+		bGr.drawImage(img, 0, 0, null);
+		bGr.dispose();
+		String imageString = null;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+		try {
+			ImageIO.write(image, "png", bos);
+			byte[] imageBytes = bos.toByteArray();
+
+			Base64 base64 = new Base64();
+			imageString = base64.encodeToString(imageBytes);
+
+			bos.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return imageString;
+	}
+
 }
