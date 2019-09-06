@@ -1,7 +1,10 @@
 package beat.chlwhdtn;
 
 import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +22,6 @@ import beat.Main;
 
 public class Track {
 	public String musicuri;
-	public String id;
 	public String title;
 	public Image image;
 	public String artist;
@@ -27,15 +29,16 @@ public class Track {
 	public String lyric;
 	public int duration;
 
-	public Track(String id, String gamemusic) {
+	public Track(String musicsrc) {
 		try {
-			this.id = id;
-			this.musicuri = gamemusic;
-			InputStream in = Main.class.getResourceAsStream("/music/"+gamemusic);
+			this.musicuri = musicsrc;
+			InputStream in = new FileInputStream(musicsrc);
+			BufferedInputStream bis = new BufferedInputStream(in);
 			File tmp = File.createTempFile("tmp", ".mp3");
 			tmp.deleteOnExit();
 			IOUtils.copy(in, new FileOutputStream(tmp));
 			in.close();
+			bis.close();
 			AudioFile audioFile = AudioFileIO.read(tmp);
 			Tag tag = audioFile.getTag();
 			this.title = tag.getFirst(FieldKey.TITLE);
@@ -44,7 +47,7 @@ public class Track {
 			this.lyric = tag.getFirst(FieldKey.LYRICS);
 			this.duration = audioFile.getAudioHeader().getTrackLength();
 			if(this.title.isEmpty() || this.title == null) {
-				title = id;
+				title = tmp.getName();
 			}
 			this.image = (Image) tag.getFirstArtwork().getImage();
 			this.image = this.image.getScaledInstance(800, 800, Image.SCALE_SMOOTH);

@@ -83,16 +83,37 @@ public class WebManager {
 	public void sendTrack(Track track) {
 		JsonObject title = new JsonObject();
 		title.addProperty("type", "title");
-		title.addProperty("data", track.title);
+		try {
+			title.addProperty("data", track.title);
+		} catch(NullPointerException e) {
+			title.addProperty("data", "재생중인 항목 없음");		
+		}
+		
 		JsonObject album = new JsonObject();
 		album.addProperty("type", "album");
-		album.addProperty("data", track.album);
+		try {
+			album.addProperty("data", track.album);
+		} catch(NullPointerException e) {
+			album.addProperty("data", " ");		
+		}
+		
 		JsonObject signer = new JsonObject();
 		signer.addProperty("type", "singer");
-		signer.addProperty("data", track.artist);
+		try {
+			signer.addProperty("data", track.artist);
+		} catch(NullPointerException e) {
+			signer.addProperty("data", " ");	
+		}
+		
 		JsonObject image = new JsonObject();
-		image.addProperty("type", "artwork");
-		image.addProperty("data", encodeToString(track.image));
+		try {
+			image.addProperty("type", "artwork");
+			image.addProperty("data", encodeToString(track.image));
+		} catch(NullPointerException e) {
+			image.addProperty("type", "null");
+			image.addProperty("data", " ");			
+		}
+		
 		new ArrayList<>(clients).forEach((client) -> {
 			client.writeFinalTextFrame(title.toString());
 			client.writeFinalTextFrame(album.toString());

@@ -2,6 +2,7 @@ package beat.chlwhdtn;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 
 import beat.Main;
@@ -10,17 +11,17 @@ import javazoom.jl.player.Player;
 public class Music extends Thread {
 	private Player player;
 	private boolean isrun;
-	private String name;
+	private Track track;
 	private File file;
 	private InputStream is;
 	private BufferedInputStream bis;
 
-	public Music(String name, boolean isrun) {
+	public Music(Track track, boolean isrun) {
 		try {
-			setName(name + " 재생 쓰레드");
+			setName(track.title + " 재생 쓰레드");
 			this.isrun = isrun;
-			this.name = name;
-			is = Main.class.getResourceAsStream("/music/"+name);
+			this.track = track;
+			is = new FileInputStream(track.musicuri);
 			bis = new BufferedInputStream(is);
 			player = new Player(bis);
 
@@ -46,7 +47,7 @@ public class Music extends Thread {
 		try {
 			do {
 				player.play();
-				is = Main.class.getResourceAsStream("/music/"+name);
+				is = new FileInputStream(track.musicuri);
 				bis = new BufferedInputStream(this.is);
 				player = new Player(this.bis);
 			} while (isrun);

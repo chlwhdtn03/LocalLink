@@ -48,12 +48,11 @@ public class Game extends Thread {
 	public Game(Track track) {
 		setName(track.title + " 메인 쓰레드");
 		this.title = track.title;
-		this.id = track.id;
 		this.combo = 0;
 		this.artist = track.artist;
 		this.artwork = track.image;
 		this.musicTitle = track.musicuri;
-		this.gameMusic = new Music(this.musicTitle, false);
+		this.gameMusic = new Music(track, false);
 	}
 
 	public void screenDraw(Graphics2D g) {

@@ -10,12 +10,16 @@ import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.SystemColor;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
+
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -30,6 +34,7 @@ import beat.Delay;
 import beat.Main;
 import beat.Timer;
 import beat.WebManager;
+import net.iharder.dnd.FileDrop;
 
 public class JavaBeat extends JFrame {
 	private Image screenImage;
@@ -89,11 +94,6 @@ public class JavaBeat extends JFrame {
 
 		min_exit = new ImageIcon(Main.class.getResource("/Min_Exit.png"));
 		min_enter = new ImageIcon(Main.class.getResource("/Min_Enter.png"));
-
-		tracklist.add(new Track("지나고도같은오늘", "지나고도같은오늘.mp3"));
-		tracklist.add(new Track("그냥냅둬", "임창정-그냥 냅둬 (Inst.).mp3"));
-		tracklist.add(new Track("해야", "해야.mp3"));
-		tracklist.add(new Track("플라워", "플라워.mp3"));
 
 		setUndecorated(true);
 		setTitle("JavaBeat");
@@ -383,6 +383,16 @@ public class JavaBeat extends JFrame {
 		add(scroll);
 
 		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
+		
+		new  FileDrop(this, new FileDrop.Listener()
+		  {   public void  filesDropped( java.io.File[] files )
+		      {   
+		         for(File file : files) {
+		        	 tracklist.add(new Track(file.getAbsolutePath()));
+		         }
+		 		selectTrack(0);
+		      }   
+		  }); 
 
 	}
 
@@ -408,7 +418,7 @@ public class JavaBeat extends JFrame {
 	}
 
 	public void gotoMenu() {
-		selectTrack(nowSelected);
+
 		startButton.setVisible(false);
 		exitButton.setVisible(false);
 		endButton.setVisible(false);
@@ -473,13 +483,15 @@ public class JavaBeat extends JFrame {
 
 	public void screenDraw(Graphics2D g) {
 		if (isMainScreen) {
-			g.drawImage(tracklist.get(nowSelected).image, 0, -100,null);
+			if(tracklist.isEmpty() == false) {
+				g.drawImage(tracklist.get(nowSelected).image, 0, -100,null);
+			}
 			g.drawImage(Background,0,0,800,30,null);
 			g.drawImage(Background, 150, 70, 500,500	, null);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(new Font("맑은 고딕", 0, 20));
 			g.setColor(Color.white);
-			g.drawString("JavaBeat", 350, 22);
+			g.drawString("JavaBeat", 350, 22); 
 		}
 		if (isGameScreen) {
 			game.screenDraw(g);
@@ -521,7 +533,7 @@ public class JavaBeat extends JFrame {
 		}
 		lyric.setCaretPosition(0);
 		selectedTrack = tracklist.get(nowSelected);
-		selectedMusic = new Music(tracklist.get(nowSelected).musicuri, true);
+		selectedMusic = new Music(tracklist.get(nowSelected), true);
 		selectedMusic.start();
 	}
 
