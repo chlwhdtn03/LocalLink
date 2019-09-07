@@ -30,6 +30,7 @@ public class WebManager {
 	private HttpServer server;
 	private final List<ServerWebSocket> clients = new ArrayList<>();
 	public int port = 10426;
+	public boolean isOpen = false;
 
 	public WebManager() {
 		server = Vertx.vertx().createHttpServer(new HttpServerOptions().setPort(port)).requestHandler(req -> {
@@ -72,7 +73,7 @@ public class WebManager {
 		}).listen(port, result -> {
 			if (result.succeeded()) {
 				System.out.println(port + " 포트로 개방 성공");
-
+				isOpen = true;
 			} else {
 				System.out.println(port + " 포트로 개방 실패");
 			}

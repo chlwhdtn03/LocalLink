@@ -37,8 +37,7 @@ public class Game extends Thread {
 	
 	public int combo;
 	private String title;
-	private String id;
-	private String musicTitle;
+	private String musicsrc;
 	private String artist;
 	private Image artwork;
 	public Music gameMusic;
@@ -51,8 +50,8 @@ public class Game extends Thread {
 		this.combo = 0;
 		this.artist = track.artist;
 		this.artwork = track.image;
-		this.musicTitle = track.musicuri;
-		this.gameMusic = new Music(track, false);
+		this.musicsrc = track.musicuri;
+		this.gameMusic = new Music(track, false, 0);
 	}
 
 	public void screenDraw(Graphics2D g) {
@@ -173,13 +172,13 @@ public class Game extends Thread {
 	public void dropNotes() {
 	
 		BeatListener bl = new Sunrise();
-		if (id.equals("해야")) {
+		if (title.equals("해야")) {
 			bl = new Sunrise();
-		} else if (id.equals("플라워")) {
+		} else if (title.equals("플라워")) {
 			bl = new Flower();
-		} else if (id.equals("지나고도같은오늘")) {
+		} else if (title.equals("지나고도같은오늘")) {
 			bl = new Sameday();
-		} else if(id.equals("그냥냅둬")) {
+		} else if(title.equals("그냥냅둬")) {
 			bl = new Justaway();
 		}
 		Beat[] beats = bl.getNotes(Main.REACH_TIME * 1000, 100);
