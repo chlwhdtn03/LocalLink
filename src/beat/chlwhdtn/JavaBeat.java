@@ -1,5 +1,6 @@
 package beat.chlwhdtn;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -9,31 +10,47 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.Stroke;
 import java.awt.SystemColor;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.geom.GeneralPath;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.Mixer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.plaf.PopupMenuUI;
+import javax.swing.plaf.basic.BasicPopupMenuUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
+import javax.swing.plaf.basic.BasicSliderUI;
 
 import beat.Delay;
 import beat.Main;
 import beat.Timer;
+import beat.Volume;
 import beat.WebManager;
 import net.iharder.dnd.FileDrop;
 
@@ -50,6 +67,7 @@ public class JavaBeat extends JFrame {
 
 	private JButton btnX = new JButton();
 	private JButton btnM = new JButton();
+	private JButton btnOption = new JButton();
 
 	private ImageIcon min_exit, min_enter;
 	private ImageIcon close_exit, close_enter;
@@ -73,6 +91,8 @@ public class JavaBeat extends JFrame {
 	private JButton playButton = new JButton("시작");
 	private JButton endButton = new JButton("←");
 
+	private JSlider volumebar = new JSlider();
+	
 	private boolean isMainScreen = false;
 	private boolean isGameScreen = false;
 
@@ -125,7 +145,60 @@ public class JavaBeat extends JFrame {
 				setLocation(currCoords.x - mouseDownCompCoords.x, currCoords.y - mouseDownCompCoords.y);
 			}
 		});
+		
+		JPopupMenu menu = new JPopupMenu();
+		menu.setBorderPainted(false);
+		menu.setBackground(new Color(0,0,0,0));
 
+		volumebar.setOrientation(SwingConstants.VERTICAL);
+		volumebar.setFocusable(false);
+		volumebar.setBackground(new Color(0,0,0,0));
+		volumebar.setValue(Volume.getVolume());
+		volumebar.addChangeListener(new ChangeListener() {
+			
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				float volume = (float) (volumebar.getValue() * 0.01);
+				Volume.setVolume(volume);
+				
+			}
+		});
+		volumebar.setUI(new BasicSliderUI(volumebar) {
+			@Override
+		    public void paintThumb(Graphics g) {
+		        g.setColor(new Color(200,200,200));
+		        g.fillRect(thumbRect.x, thumbRect.y, thumbRect.width, thumbRect.height);
+		    }
+			@Override
+			public void paintTrack(Graphics g) {
+				g.setColor(new Color(50, 50, 50, 150));
+				g.fillRect(trackRect.x, trackRect.y, trackRect.width, trackRect.height);
+			}
+		});
+		menu.add(volumebar);
+		
+		btnOption.setBounds(150, 545, 50, 25);
+		btnOption.setForeground(Color.WHITE);
+		btnOption.setFont(new Font("맑은 고딕", 0, 16));
+		btnOption.setContentAreaFilled(false);
+		btnOption.setFocusPainted(false);
+		btnOption.setOpaque(true);
+		btnOption.setBorderPainted(true);
+		btnOption.setBorder(new LineBorder(Color.white));
+		btnOption.setBackground(new Color(0, 0, 0, 0));
+		btnOption.setVisible(false);
+		btnOption.setText("V");
+		btnOption.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println(menu.getHeight());
+				menu.show(btnOption, -1-volumebar.getPreferredSize().width, -5+btnOption.getHeight()-volumebar.getPreferredSize().height);
+			}
+		});
+		add(btnOption);
+		
 		btnX.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnX.setBorder(null);
 		btnX.addMouseListener(new MouseAdapter() {
@@ -406,9 +479,15 @@ public class JavaBeat extends JFrame {
 			public void filesDropped(java.io.File[] files) {
 				if (isMainScreen) {
 					for (File file : files) {
-						tracklist.add(new Track(file.getAbsolutePath()));
+						if(file.isDirectory()) {
+							filesDropped(file.listFiles());
+							continue;
+						}
+						if(file.getName().endsWith(".mp3"))
+							tracklist.add(new Track(file.getAbsolutePath()));
 					}
-					selectTrack(0);
+					if(tracklist.isEmpty() == false)
+						selectTrack(0);
 				}
 			}
 		});
@@ -450,6 +529,7 @@ public class JavaBeat extends JFrame {
 		showlyricButton.setVisible(true);
 		timebar.setVisible(true);
 		nowtime.setVisible(true);
+		btnOption.setVisible(true);
 		isMainScreen = true;
 	}
 
@@ -485,6 +565,7 @@ public class JavaBeat extends JFrame {
 		artwork.setVisible(false);
 		timebar.setVisible(false);
 		nowtime.setVisible(false);
+		btnOption.setVisible(false);
 		showlyricButton.setVisible(false);
 	}
 

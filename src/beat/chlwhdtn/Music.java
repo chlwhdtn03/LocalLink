@@ -34,7 +34,6 @@ public class Music extends Thread {
 			skipped = skip * 1000;
 			bis.skip(skip * track.byteforsec);
 			player = new Player(bis);
-			
 
 		} catch (Exception e) {
 			e.printStackTrace();
