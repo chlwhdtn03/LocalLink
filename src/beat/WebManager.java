@@ -28,7 +28,7 @@ import io.vertx.core.http.ServerWebSocket;
 public class WebManager {
 
 	private HttpServer server;
-	private final List<ServerWebSocket> clients = new ArrayList<>();
+	public final List<ServerWebSocket> clients = new ArrayList<>();
 	public int port = 10426;
 	public boolean isOpen = false;
 
