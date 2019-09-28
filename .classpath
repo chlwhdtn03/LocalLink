@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/commons-codec-1.9.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/commons-io-2.6.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/filedrop.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/gson-2.8.5.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/jl1.0.1.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/netty-all-4.1.39.Final.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/resource.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/vertx-core-3.8.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/mp3spi1.9.5.jar"/>
-	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/JavaBeat/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/filedrop.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/gson-2.8.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/jaudiotagger-2.2.6-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/jl1.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/mp3spi1.9.5.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/netty-all-4.1.39.Final.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/resource.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/vertx-core-3.8.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/commons-codec-1.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
