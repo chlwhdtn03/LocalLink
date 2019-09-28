@@ -325,8 +325,8 @@ public class JavaBeat extends JFrame {
 		}
 		try {
 			wm.sendTrack(tracklist.get(nowSelected));
-		} catch (NullPointerException e) {
-
+		} catch (Exception e) {
+			return;
 		}
 
 		setTitle("▶ " + tracklist.get(nowSelected).title);
