@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src=https://code.jquery.com/jquery-2.x-git.js></script> 
     <script>
         $(
@@ -53,41 +53,77 @@
         text-align: center;
     }
 
+    html, body {
+        margin: 0;
+    }
+
     p {
-        margin-top: 0px;
+        margin-bottom: 100px;
     }
 
     img {
         max-width: 400px;
     }
 
-    button {
-        text-decoration: none;
-        border: none;
-        padding: 5px;
-        display: inline-block;
-        font-size: 15px;
-        margin: 5px;
-        color: white;
-        background-color: #000000;
-        cursor: pointer;
+    nav {
+        z-index: 10;
+        text-align: center;
+        background: #b3ffab; /* fallback for old browsers */
+        background: -webkit-linear-gradient(to right, #b3ffab, #12fff7); /* Chrome 10-25, Safari 5.1-6 */
+        background: linear-gradient(to right, #b3ffab, #12fff7); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+        box-shadow: 0 0 10px rgba(100,100,100);
+        position: fixed;
+        list-style: none;  
+        width: 100%;
+        bottom: 0;
+        font-size: 16px;
+    }   
+
+    nav .content {
+        position: absolute;
     }
-    
+
+    nav ul {
+        margin: 0;
+        padding: 15px;
+    }
+
+    ul li {
+        display: inline-block;
+    }
+
+    li button {
+        border-radius: 5px; 
+        border: 1px;
+        padding: 5px 30px;
+        background-color: white;
+        text-decoration: none;
+        color: #007bff;
+        transition: color 1s;
+    }
+
+    li button:hover {
+        background-color: #007bff;
+        color: white;
+    }
+
     </style>
     <meta charset="UTF-8">
     <title>JavaBeat</title>
 </head>
 
 <body>
-    <div>
         <figure>
             <img id="image" src="" width=100% height=100% onerror="this.src='Noimg.png'">
             <p><span style="font-size: 1.2rem;" id="title">Title</span><br>
             <span style="color: blue;"><span id="singer">artist</span> - <span id="album">album</span></span></p>
         </figure>
-        <button id="back" onclick="backsong()">이전 곡</button>
-        <button id="next" onclick="nextsong()">다음 곡</button>
-    </div>
-</body>
 
+        <nav>
+            <ul>
+                <li><button id="back" onclick="backsong()">이전 곡</button></li>
+                <li><button id="next" onclick="nextsong()">다음 곡</button></li>
+            </ul>
+        </nav>
+</body>
 </html>

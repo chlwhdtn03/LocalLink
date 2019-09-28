@@ -1,6 +1,6 @@
 package musicdata;
 
-import beat.chlwhdtn.Beat;
+import locallink.chlwhdtn.Beat;
 
 public interface BeatListener {
 	

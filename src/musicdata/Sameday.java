@@ -1,6 +1,6 @@
 package musicdata;
 
-import beat.chlwhdtn.Beat;
+import locallink.chlwhdtn.Beat;
 
 /*
  * 임창정 지나고도 같은 오늘
