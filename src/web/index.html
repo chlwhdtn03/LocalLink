@@ -3,6 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src=https://code.jquery.com/jquery-2.x-git.js></script> 
+
     <script>
         $(
             function () {
@@ -20,13 +21,14 @@
                             $("#singer").text(a.data);
                             break;
                         case "title":
-                            $("#title").text(a.data);
+                            $("#title,#navtitle").text(a.data);
                             break;
                         case "album":
                             $("#album").text(a.data);
                             break;
                         case "artwork":
                             $("#image").attr('src', 'data:image/png;base64,' + a.data);
+                            $(".navimg").css('background-image', 'url(data:image/png;base64,' + a.data + ')');
                             break;
                     }
                 }
@@ -48,82 +50,83 @@
     </script>
 
     <style>
-    
-    * {
-        text-align: center;
-    }
 
-    html, body {
-        margin: 0;
-    }
+        body {
+            margin: 8px 0px;
+            padding-bottom: 5em;
+        }
 
-    p {
-        margin-bottom: 100px;
-    }
+        .music {
+            margin: 0 auto;
+            text-align: center;
+        }
 
-    img {
-        max-width: 400px;
-    }
+        .music img {
+            height: 100%;
+            width: 100%;
+            max-width: 400px;
+        }
+        @media ( max-height: 530px ) {
+            
+            .music img {
+                height: 80%;
+                width: 80%;
+                max-width: 300px;
+            }
+        }
 
-    nav {
-        z-index: 10;
-        text-align: center;
-        background: #b3ffab; /* fallback for old browsers */
-        background: -webkit-linear-gradient(to right, #b3ffab, #12fff7); /* Chrome 10-25, Safari 5.1-6 */
-        background: linear-gradient(to right, #b3ffab, #12fff7); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-        box-shadow: 0 0 10px rgba(100,100,100);
-        position: fixed;
-        list-style: none;  
-        width: 100%;
-        bottom: 0;
-        font-size: 16px;
-    }   
 
-    nav .content {
-        position: absolute;
-    }
+        .music p {
+            color: blue;
+        }
 
-    nav ul {
-        margin: 0;
-        padding: 15px;
-    }
+        nav {     
+            z-index: 2;
+            background: #b3ffab; /* fallback for old browsers */
+            background: -webkit-linear-gradient(to right, #b3ffab, #12fff7); /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to right, #b3ffab, #12fff7); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            background-position: center;
+            width: 100%;
+            position: fixed;
+            height: 4em;
+            bottom: 0;
+        }
 
-    ul li {
-        display: inline-block;
-    }
+        nav .navimg {
+            z-index: -1;
+            position: absolute;
+            background-position: center;
+            width: 100%;
+            height: 4em;
+            filter: blur(5px);
+            -webkit-filter: blur(5px);
+        }
 
-    li button {
-        border-radius: 5px; 
-        border: 1px;
-        padding: 5px 30px;
-        background-color: white;
-        text-decoration: none;
-        color: #007bff;
-        transition: color 1s;
-    }
-
-    li button:hover {
-        background-color: #007bff;
-        color: white;
-    }
+        nav .navinfo {
+            
+            z-index: 4;
+        }
 
     </style>
+
+
     <meta charset="UTF-8">
-    <title>JavaBeat</title>
+    <title>LocalLink</title>
 </head>
 
 <body>
-        <figure>
-            <img id="image" src="" width=100% height=100% onerror="this.src='Noimg.png'">
-            <p><span style="font-size: 1.2rem;" id="title">Title</span><br>
-            <span style="color: blue;"><span id="singer">artist</span> - <span id="album">album</span></span></p>
-        </figure>
+    <div class="music">
+        <img id="image" src="" onerror="this.src='Noimg.png'">
+        <h3><span id="title">내가 저지른 사랑</span></h3>
+        <p><span id="singer">임창정</span> - <span id="album">I'm</span></p>
+    </div>
 
-        <nav>
-            <ul>
-                <li><button id="back" onclick="backsong()">이전 곡</button></li>
-                <li><button id="next" onclick="nextsong()">다음 곡</button></li>
-            </ul>
-        </nav>
+    <nav>
+        <div class="navimg"></div>
+        <div class="navinfo">
+            <p><span id="navtitle">title</span></p>
+        </div>
+    </nav>
+
 </body>
 </html>

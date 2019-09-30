@@ -79,7 +79,7 @@ public class LocalLink extends JFrame {
 	/* 공통 요소 */
 	private JButton btnX = new JButton();
 	private JButton btnM = new JButton();
-
+	private JButton btnH = new JButton();
 	/* Main 화면 요소 */
 	private JList<String> connect_list = new JList<String>();
 	private JScrollPane connect_scroll = new JScrollPane(connect_list);
@@ -429,6 +429,30 @@ public class LocalLink extends JFrame {
 			btnM.setBorderPainted(false);
 			btnM.setIcon(min_exit);
 			btnM.setBounds(740, 0, 30, 30);
+			
+			btnH.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			btnH.setBorder(null);
+			btnH.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					btnH.setIcon(min_enter);
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					btnH.setIcon(min_exit);
+				}
+
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					changeScreen(ScreenType.MainMenu);
+				}
+			});
+			btnH.setOpaque(false);
+			btnH.setContentAreaFilled(false);
+			btnH.setBorderPainted(false);
+			btnH.setIcon(min_exit);
+			btnH.setBounds(0, 0, 30, 30);
 
 			addKeyListener(new GameKeyListener());
 
@@ -436,7 +460,8 @@ public class LocalLink extends JFrame {
 
 			add(btnX);
 			add(btnM);
-
+			add(btnH);
+			
 		}
 	}
 
