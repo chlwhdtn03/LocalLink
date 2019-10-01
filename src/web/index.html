@@ -12,7 +12,7 @@
                     webSocket.send("connect");
                 };
                 webSocket.onclose = function () {
-                    alert("JavaBeat : 서버와 연결이 종료되었습니다.")
+                    alert("서버와 연결이 종료되었습니다.")
                 };
                 webSocket.onmessage = function (b) {
                     var a = JSON.parse(b.data);
@@ -53,7 +53,7 @@
 
         body {
             margin: 8px 0px;
-            padding-bottom: 5em;
+            padding-bottom: 4em;
         }
 
         .music {
@@ -75,8 +75,12 @@
             }
         }
 
+        .music h3 {
+            margin: 16px 0 0 0;
+        }
 
         .music p {
+            margin: 0;
             color: blue;
         }
 
@@ -86,6 +90,7 @@
             background: -webkit-linear-gradient(to right, #b3ffab, #12fff7); /* Chrome 10-25, Safari 5.1-6 */
             background: linear-gradient(to right, #b3ffab, #12fff7); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
             background-position: center;
+            box-shadow: 0 0 10px rgba(100,100,100);
             width: 100%;
             position: fixed;
             height: 4em;
@@ -103,8 +108,37 @@
         }
 
         nav .navinfo {
-            
+            padding: 0px 8px;
+            float: left;
+            text-align: center;
+            box-sizing: border-box;
+            width: 70%;
+            height: 4em;
             z-index: 4;
+        }
+
+        nav .navinfo p {
+            color: white;
+            text-shadow: 0px 0px 2px black;
+        }
+
+        nav .controller {
+            float: right;
+            box-sizing: border-box;
+            line-height: 3em;
+            height: 4em;
+            width: 30%;
+            z-index: 4;
+        }
+
+        nav button {
+            border-radius: 5px; 
+            border: 1px;
+            padding: 10px 15px;
+            background-color: white;
+            text-decoration: none;
+            color: #007bff;
+            transition: color 1s;
         }
 
     </style>
@@ -117,14 +151,18 @@
 <body>
     <div class="music">
         <img id="image" src="" onerror="this.src='Noimg.png'">
-        <h3><span id="title">내가 저지른 사랑</span></h3>
-        <p><span id="singer">임창정</span> - <span id="album">I'm</span></p>
+        <h3><span id="title">재생중인 MP3 없음</span></h3>
+        <p><span id="singer">Local</span> - <span id="album">Link</span></p>
     </div>
 
     <nav>
         <div class="navimg"></div>
         <div class="navinfo">
-            <p><span id="navtitle">title</span></p>
+            <p><span id="navtitle">재생중인 MP3 없음</span></p>
+        </div>
+        <div class="controller">
+            <button id="back" onclick="backsong()">&lt;</button>
+            <button id="next" onclick="nextsong()">&gt;</button>
         </div>
     </nav>
 
