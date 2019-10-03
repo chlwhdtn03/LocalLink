@@ -90,9 +90,9 @@ public class LocalLink extends JFrame {
 
 	/* Music 유틸 */
 	ArrayList<Track> tracklist = new ArrayList<Track>();
-	private Music selectedMusic;
-	private boolean lyricmode = false;
-	private int nowSelected = 0;
+	public Music selectedMusic;
+	public boolean lyricmode = false;
+	public int nowSelected = 0;
 	public Track selectedTrack;
 
 	/* Music 화면 요소 */
@@ -179,6 +179,7 @@ public class LocalLink extends JFrame {
 						if (file.getName().endsWith(".mp3"))
 							tracklist.add(new Track(file.getAbsolutePath()));
 					}
+					System.out.println("Dropped");
 					if (tracklist.isEmpty() == false)
 						selectTrack(0);
 				}
@@ -311,7 +312,7 @@ public class LocalLink extends JFrame {
 		try {
 			wm.sendTrack(tracklist.get(nowSelected));
 		} catch (Exception e) {
-			return;
+			e.printStackTrace();
 		}
 
 		setTitle("▶ " + tracklist.get(nowSelected).title);
@@ -339,10 +340,12 @@ public class LocalLink extends JFrame {
 		lyric.setCaretPosition(0);
 		selectedTrack = tracklist.get(nowSelected);
 		try {
-			selectedMusic = new Music(tracklist.get(nowSelected), true, 0, selectedMusic.getLock());
+			selectedMusic = new Music(tracklist.get(nowSelected), false, 0, selectedMusic.getLock());
 		} catch (NullPointerException e) {
-			selectedMusic = new Music(tracklist.get(nowSelected), true, 0, false);
+			selectedMusic = new Music(tracklist.get(nowSelected), false,
+					0, false);
 		}
+		
 		selectedMusic.start();
 	}
 
@@ -690,7 +693,7 @@ public class LocalLink extends JFrame {
 					if (selectedMusic != null)
 						selectedMusic.close();
 					System.out.println(selectedMusic.getLock());
-					selectedMusic = new Music(tracklist.get(nowSelected), true, progressBarVal, selectedMusic.getLock());
+					selectedMusic = new Music(tracklist.get(nowSelected), false, progressBarVal, selectedMusic.getLock());
 					selectedMusic.start();
 				}
 			});

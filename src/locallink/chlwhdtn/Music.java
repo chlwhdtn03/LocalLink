@@ -12,12 +12,14 @@ import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.SourceDataLine;
 
+import org.jaudiotagger.audio.exceptions.NoWritePermissionsException;
+
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
 public class Music extends Thread {
 	private Player player;
-	private boolean isrun; 
+	private boolean isrun;
 	boolean lock = false;
 	Object lockobject = new Object();
 	private Track track;
@@ -30,14 +32,13 @@ public class Music extends Thread {
 	public Music(Track track, boolean isrun, int skip, boolean lock) {
 		try {
 			setName(track.title + " 재생 쓰레드");
-			this.lock = lock;			
+			this.lock = lock;
 			this.isrun = isrun;
 			this.track = track;
 			is = new FileInputStream(track.musicuri);
 			is.skip((skip) * track.byteforsec);
-			skipped = ((track.bytelength - is.available()) / track.byteforsec)*1000;
+			skipped = ((track.bytelength - is.available()) / track.byteforsec) * 1000;
 			bis = new BufferedInputStream(is);
-			
 			player = new Player(bis);
 
 		} catch (Exception e) {
@@ -74,29 +75,39 @@ public class Music extends Thread {
 			if (lock == true)
 				resume();
 			player.close();
-			interrupt();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	boolean Finished = false;
+
 	public void run() {
 		try {
 			do {
 				synchronized (lockobject) {
-					while(lock)
+					while (lock)
 						try {
 							lockobject.wait();
-						} catch(InterruptedException e) {
+						} catch (InterruptedException e) {
 							break;
 						}
 				}
 				player.play();
 				skipped = 0;
+				if (isrun == false) {
+					if (player.isComplete()) {
+						close();
+						LocalLink.instance.selectRight();
+						break;
+					}
+				}
 				is = new FileInputStream(track.musicuri);
 				bis = new BufferedInputStream(this.is);
 				player = new Player(this.bis);
+
 			} while (isrun);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
