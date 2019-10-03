@@ -2,16 +2,10 @@ package locallink;
 
 
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
-import javax.sound.sampled.Control;
 import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.FloatControl.Type;
-
 import javazoom.jl.player.JavaSoundAudioDevice;
 
-import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
-import javax.sound.sampled.Mixer;
 import javax.sound.sampled.Port;
 import javax.sound.sampled.Port.Info;
 

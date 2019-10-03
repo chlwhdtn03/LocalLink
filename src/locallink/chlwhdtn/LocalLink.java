@@ -1,8 +1,6 @@
 package locallink.chlwhdtn;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -11,32 +9,21 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.Stroke;
 import java.awt.SystemColor;
-import java.awt.datatransfer.DataFlavor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
-import java.awt.geom.GeneralPath;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Vector;
 
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.Mixer;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -46,8 +33,6 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import javax.swing.plaf.PopupMenuUI;
-import javax.swing.plaf.basic.BasicPopupMenuUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.plaf.basic.BasicSliderUI;
 
@@ -60,7 +45,7 @@ import locallink.WebManager;
 import net.iharder.dnd.FileDrop;
 
 public class LocalLink extends JFrame {
-
+	private static final long serialVersionUID = -1882255829881847050L;
 	/* 유틸 */
 	public static LocalLink instance;
 	int fps = 144;
@@ -376,6 +361,14 @@ public class LocalLink extends JFrame {
 			break;
 		case Music:
 			initMusic(false);
+			break;
+		case Chat:
+			break;
+		case FileTransfer:
+			break;
+		case MusicGame:
+			break;
+		default:
 			break;
 		}
 		nowScreen = st;

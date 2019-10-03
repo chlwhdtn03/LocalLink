@@ -26,6 +26,7 @@ import locallink.chlwhdtn.Track;
 
 public class WebManager {
 
+	@SuppressWarnings("unused")
 	private HttpServer server;
 	public final List<ServerWebSocket> clients = new ArrayList<>();
 	public int port = 10426;

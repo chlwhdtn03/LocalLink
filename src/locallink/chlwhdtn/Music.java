@@ -1,20 +1,9 @@
 package locallink.chlwhdtn;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.InputStream;
 
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.SourceDataLine;
-
-import org.jaudiotagger.audio.exceptions.NoWritePermissionsException;
-
-import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
 
 public class Music extends Thread {
@@ -23,12 +12,9 @@ public class Music extends Thread {
 	boolean lock = false;
 	Object lockobject = new Object();
 	private Track track;
-	private File file;
 	private InputStream is;
 	private long skipped = 0;
 	private BufferedInputStream bis;
-	private SourceDataLine dataLine;
-
 	public Music(Track track, boolean isrun, int skip, boolean lock) {
 		try {
 			setName(track.title + " 재생 쓰레드");
@@ -56,6 +42,7 @@ public class Music extends Thread {
 		return lock;
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setLock(boolean bool) {
 		if (bool) {
 			suspend();
@@ -69,6 +56,7 @@ public class Music extends Thread {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	public void close() {
 		try {
 			isrun = false;

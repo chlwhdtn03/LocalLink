@@ -35,9 +35,8 @@ public class Game extends Thread {
 	public Image PerfectImage = new ImageIcon(Main.class.getResource("/images/Perfect.png")).getImage();
 	public Image JudgeImage;
 	
-	public int combo;
+	public int combo; 
 	private String title;
-	private String musicsrc;
 	private String artist;
 	private Image artwork;
 	public Music gameMusic;
@@ -50,7 +49,6 @@ public class Game extends Thread {
 		this.combo = 0;
 		this.artist = track.artist;
 		this.artwork = track.image;
-		this.musicsrc = track.musicuri;
 		this.gameMusic = new Music(track, false, 0, false);
 	}
 
