@@ -1,0 +1,28 @@
+.music {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.music img {
+    height: 100%;
+    width: 100%;
+    max-width: 400px;
+}
+
+@media (max-height: 530px) {
+
+    .music img {
+        height: 80%;
+        width: 80%;
+        max-width: 300px;
+    }
+}
+
+.music h3 {
+    margin: 16px 0 0 0;
+}
+
+.music p {
+    margin: 0;
+    color: blue;
+}
