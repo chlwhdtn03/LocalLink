@@ -10,7 +10,7 @@ nav {
     box-shadow: 0 0 10px rgba(100, 100, 100);
     width: 100%;
     position: fixed;
-    height: 4em;
+    height: 3em;
     bottom: 0;
 }
 
@@ -19,7 +19,7 @@ nav .navimg {
     position: absolute;
     background-position: center;
     width: 100%;
-    height: 4em;
+    height: 3em;
     filter: blur(5px);
     -webkit-filter: blur(5px);
 }
@@ -30,7 +30,7 @@ nav .navinfo {
     text-align: center;
     box-sizing: border-box;
     width: 70%;
-    height: 4em;
+    height: 3em;
     z-index: 4;
 }
 
@@ -41,9 +41,8 @@ nav .navinfo p {
 
 nav .controller {
     float: right;
-    box-sizing: border-box;
     line-height: 3em;
-    height: 4em;
+    height: 3em;
     width: 30%;
     z-index: 4;
 }
@@ -51,7 +50,7 @@ nav .controller {
 nav button {
     border-radius: 5px;
     border: 1px;
-    padding: 10px 15px;
+    padding: 5px;
     background-color: white;
     text-decoration: none;
     color: #007bff;

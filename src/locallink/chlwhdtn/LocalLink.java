@@ -20,10 +20,12 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
+import javax.swing.JApplet;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
@@ -72,7 +74,10 @@ public class LocalLink extends JFrame {
 	/* MainMenu 화면 요소 */
 	private JButton exitButton = new JButton("나가기");
 	private JButton musicButton = new JButton("시작하기");
-
+	private JPanel musicpanel = new JPanel();
+	private JLabel main_artwork = new JLabel();
+	private JLabel main_titlelabel = new JLabel("재생중인 MP3 없음");
+			
 	/* Music 유틸 */
 	ArrayList<Track> tracklist = new ArrayList<Track>();
 	public Music selectedMusic;
@@ -122,7 +127,7 @@ public class LocalLink extends JFrame {
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-		setBackground(new Color(0, 0, 0, 0));
+		setBackground(new Color(100, 100, 100, 0));
 		setLayout(null);
 
 		addMouseListener(new MouseAdapter() {
@@ -305,17 +310,20 @@ public class LocalLink extends JFrame {
 
 		songinfo.setText("<html><center>" + tracklist.get(nowSelected).artist + " - " + tracklist.get(nowSelected).title
 				+ "<br>" + tracklist.get(nowSelected).album + "</center></html>");
+		main_titlelabel.setText(tracklist.get(nowSelected).title);
 
 		timebar.setValue(0);
 		timebar.setMaximum(tracklist.get(nowSelected).duration);
 		playtime.setText(Timer.getTime(tracklist.get(nowSelected).duration));
 		if (tracklist.get(nowSelected).image == null) {
 			artwork.setIcon(null);
+			main_artwork.setIcon(null);
 			checklyric(true);
 		} else {
-			artwork.setIcon(
-					new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
-							tracklist.get(nowSelected).title));
+			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
+					tracklist.get(nowSelected).title);
+			artwork.setIcon(art);
+			main_artwork.setIcon(art);
 			checklyric(false);
 		}
 		lyric.setText(tracklist.get(nowSelected).lyric);
@@ -491,8 +499,8 @@ public class LocalLink extends JFrame {
 				}
 			});
 
-			connect_scroll.setBounds(175, 175, 450, 250);
-			connect_scroll.setBackground(new Color(0, 0, 0, 0));
+			connect_scroll.setBounds(175, 175, 200, 250);
+			connect_scroll.setBackground(Color.DARK_GRAY);
 			connect_scroll.setBorder(null);
 			connect_scroll.getVerticalScrollBar().setUnitIncrement(7);
 			connect_scroll.getVerticalScrollBar().setBackground(new Color(0, 0, 0, 100));
@@ -525,14 +533,30 @@ public class LocalLink extends JFrame {
 				}
 
 			});
-			connect_list.setBackground(new Color(0, 0, 0, 0));
+			connect_list.setBackground(Color.DARK_GRAY);
 			connect_list.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
 			connect_list.setForeground(Color.white);
 
+			
+			
+			musicpanel.setBounds(500, 175, 275, 300);
+			musicpanel.setLayout(null);
+			
+			main_artwork.setBounds((musicpanel.getWidth() - 250) / 2,0,250,250);
+			
+			main_titlelabel.setBounds(0,250,275,50);
+			main_titlelabel.setHorizontalAlignment(SwingConstants.CENTER);
+			main_titlelabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			main_titlelabel.setForeground(Color.black);
+			
+			musicpanel.add(main_artwork);
+			musicpanel.add(main_titlelabel);
+			
 		} else {
 			add(exitButton);
 			add(musicButton);
 			add(connect_scroll);
+			add(musicpanel);
 		}
 	}
 
