@@ -1,10 +1,11 @@
+
 $(
 
     function () {
-        
+
         $("#url").text(document.domain);
         $("#login").submit(
-            function(e) { 
+            function (e) {
 
                 e.preventDefault();
                 $("#login-form").hide();
@@ -31,17 +32,29 @@ $(
                 case "album":
                     $("#album").text(a.data);
                     break;
+                case "lyric":
+                        $("#lyric").text(a.data);
+                        break;
                 case "artwork":
+                    a.data = a.data.replace(/(\r\n|\n|\r)/gm, "");
                     $("#image").attr('src', 'data:image/png;base64,' + a.data);
                     $(".navimg").css('background-image', 'url(data:image/png;base64,' + a.data + ')');
                     break;
             }
         }
     });
+
+function showlyric() {
+    $("#lyric-form").show();
+}
+
+function hidelyric() {
+    $("#lyric-form").hide();
+}
+
 function nextsong() {
     webSocket.send("nextsong");
 }
 function backsong() {
     webSocket.send("backsong");
 }
-

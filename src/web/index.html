@@ -15,9 +15,16 @@
 
 <body>
     <div class="music">
-        <img id="image" src="" onerror="this.src='Noimg.png'">
+        <img id="image" src="" onerror="this.src='Noimg.png'" onclick="showlyric()">
         <h3><span id="title">재생중인 MP3 없음</span></h3>
         <p><span id="singer">Local</span> - <span id="album">Link</span></p>
+
+        <div id="lyric-form" style="display: none">
+            <div class="lyric-content">
+                <span class="close" onclick="hidelyric()">닫기</span>
+                <p><span id="lyric">가사 없음</span></p>
+            </div>
+        </div>
     </div>
     
     <nav>

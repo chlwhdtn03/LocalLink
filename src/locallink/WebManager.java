@@ -82,45 +82,60 @@ public class WebManager {
 	}
 
 	public void sendTrack(Track track) {
-		JsonObject title = new JsonObject();
-		title.addProperty("type", "title");
-		try {
-			title.addProperty("data", track.title);
-		} catch(NullPointerException e) {
-			title.addProperty("data", "재생중인 항목 없음");		
-		}
-		
-		JsonObject album = new JsonObject();
-		album.addProperty("type", "album");
-		try {
-			album.addProperty("data", track.album);
-		} catch(NullPointerException e) {
-			album.addProperty("data", " ");		
-		}
-		
-		JsonObject signer = new JsonObject();
-		signer.addProperty("type", "singer");
-		try {
-			signer.addProperty("data", track.artist);
-		} catch(NullPointerException e) {
-			signer.addProperty("data", " ");	
-		}
-		
-		JsonObject image = new JsonObject();
-		try {
-			image.addProperty("type", "artwork");
-			image.addProperty("data", encodeToString(track.image));
-		} catch(NullPointerException e) {
-			image.addProperty("type", "null");
-			image.addProperty("data", " ");			
-		}
-		
-		new ArrayList<>(clients).forEach((client) -> {
-			client.writeFinalTextFrame(title.toString());
-			client.writeFinalTextFrame(album.toString());
-			client.writeFinalTextFrame(signer.toString());
-			client.writeFinalTextFrame(image.toString());
+		if(clients.isEmpty())
+			return;
+		Thread thread = new Thread(() ->{
+			JsonObject title = new JsonObject();
+			title.addProperty("type", "title");
+			try {
+				title.addProperty("data", track.title);
+			} catch(NullPointerException e) {
+				title.addProperty("data", "재생중인 항목 없음");		
+			}
+			
+			JsonObject album = new JsonObject();
+			album.addProperty("type", "album");
+			try {
+				album.addProperty("data", track.album);
+			} catch(NullPointerException e) {
+				album.addProperty("data", " ");		
+			}
+			
+			JsonObject signer = new JsonObject();
+			signer.addProperty("type", "singer");
+			try {
+				signer.addProperty("data", track.artist);
+			} catch(NullPointerException e) {
+				signer.addProperty("data", " ");	
+			}
+			
+			JsonObject image = new JsonObject();
+			try {
+				image.addProperty("type", "artwork");
+				image.addProperty("data", encodeToString(track.image));
+			} catch(NullPointerException e) {
+				image.addProperty("type", "artwork");
+				image.addProperty("data", " ");			
+			}
+			
+			JsonObject lyric = new JsonObject();
+			lyric.addProperty("type", "lyric");
+			try {
+				lyric.addProperty("data", track.lyric);
+			} catch(NullPointerException e) {
+				lyric.addProperty("data", " ");			
+			}
+			
+			new ArrayList<>(clients).forEach((client) -> {
+				client.writeFinalTextFrame(title.toString());
+				client.writeFinalTextFrame(album.toString());
+				client.writeFinalTextFrame(signer.toString());
+				client.writeFinalTextFrame(lyric.toString());
+				client.writeFinalTextFrame(image.toString());
+			});
 		});
+		thread.setName("웹 데이터 전송");
+		thread.start();
 	}
 
 	public String encodeToString(Image img) {

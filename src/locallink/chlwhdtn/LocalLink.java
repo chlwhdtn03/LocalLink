@@ -62,6 +62,7 @@ public class LocalLink extends JFrame {
 	private Image Background; // (정보창) 회색 배경
 	private ImageIcon min_exit, min_enter;
 	private ImageIcon close_exit, close_enter;
+	private ImageIcon home_exit, home_enter;
 
 	/* 공통 요소 */
 	private JButton btnX = new JButton();
@@ -91,7 +92,7 @@ public class LocalLink extends JFrame {
 	private JButton backButton = new JButton("<<");
 	private JButton showlyricButton = new JButton("가사");
 	private JButton btnOption = new JButton();
-	private JLabel titlelabel = new JLabel("JavaBeat");
+	private JLabel titlelabel = new JLabel("LocalLink");
 	private JLabel artwork = new JLabel();
 	private JLabel songinfo = new JLabel("MP3 파일을 이곳에 드래그하세요!");
 	private JLabel playtime = new JLabel("0:00");
@@ -119,15 +120,18 @@ public class LocalLink extends JFrame {
 
 		min_exit = new ImageIcon(Main.class.getResource("/Min_Exit.png"));
 		min_enter = new ImageIcon(Main.class.getResource("/Min_Enter.png"));
+		
+		home_exit = new ImageIcon(Main.class.getResource("/Home_Exit.png"));
+		home_enter = new ImageIcon(Main.class.getResource("/Home_Enter.png"));
 
 		setUndecorated(true); // 테두리 상단창 삭제
-		setTitle("JavaBeat");
+		setTitle("LocalLink");
 		setSize(Main.WIDTH, Main.HEIGHT);
 		setResizable(false);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
-		setBackground(new Color(100, 100, 100, 0));
+		setBackground(new Color(0, 0, 0, 0));
 		setLayout(null);
 
 		addMouseListener(new MouseAdapter() {
@@ -161,6 +165,7 @@ public class LocalLink extends JFrame {
 		new FileDrop(this, new FileDrop.Listener() {
 			public void filesDropped(java.io.File[] files) {
 				if (nowScreen.equals(ScreenType.Music)) {
+					boolean empty = tracklist.isEmpty();
 					for (File file : files) {
 						if (file.isDirectory()) {
 							filesDropped(file.listFiles());
@@ -169,13 +174,11 @@ public class LocalLink extends JFrame {
 						if (file.getName().endsWith(".mp3"))
 							tracklist.add(new Track(file.getAbsolutePath()));
 					}
-					System.out.println("Dropped");
-					if (tracklist.isEmpty() == false)
+					if (empty)
 						selectTrack(0);
 				}
 			}
 		});
-
 	}
 
 	// 게임 시작 쓰레드 생성
@@ -304,7 +307,6 @@ public class LocalLink extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		setTitle("▶ " + tracklist.get(nowSelected).title);
 		titlelabel.setText("▶ " + tracklist.get(nowSelected).title);
 
@@ -320,8 +322,7 @@ public class LocalLink extends JFrame {
 			main_artwork.setIcon(null);
 			checklyric(true);
 		} else {
-			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH),
-					tracklist.get(nowSelected).title);
+			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH));
 			artwork.setIcon(art);
 			main_artwork.setIcon(art);
 			checklyric(false);
@@ -338,7 +339,6 @@ public class LocalLink extends JFrame {
 			selectedMusic = new Music(tracklist.get(nowSelected), false,
 					0, false);
 		}
-		
 		selectedMusic.start();
 	}
 
@@ -408,6 +408,7 @@ public class LocalLink extends JFrame {
 			btnX.setContentAreaFilled(false);
 			btnX.setBorderPainted(false);
 			btnX.setIcon(close_exit);
+			btnX.setFocusable(false);
 			btnX.setBounds(770, 0, 30, 30);
 
 			btnM.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -432,6 +433,7 @@ public class LocalLink extends JFrame {
 			btnM.setContentAreaFilled(false);
 			btnM.setBorderPainted(false);
 			btnM.setIcon(min_exit);
+			btnM.setFocusable(false);
 			btnM.setBounds(740, 0, 30, 30);
 			
 			btnH.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -439,12 +441,12 @@ public class LocalLink extends JFrame {
 			btnH.addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					btnH.setIcon(min_enter);
+					btnH.setIcon(home_enter);
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					btnH.setIcon(min_exit);
+					btnH.setIcon(home_exit);
 				}
 
 				@Override
@@ -455,7 +457,8 @@ public class LocalLink extends JFrame {
 			btnH.setOpaque(false);
 			btnH.setContentAreaFilled(false);
 			btnH.setBorderPainted(false);
-			btnH.setIcon(min_exit);
+			btnH.setIcon(home_exit);
+			btnH.setFocusable(false);
 			btnH.setBounds(0, 0, 30, 30);
 
 			addKeyListener(new GameKeyListener());
