@@ -1,6 +1,5 @@
 package locallink;
 
-
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -21,6 +20,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.ServerWebSocket;
+import locallink.Account.AccountManager;
 import locallink.chlwhdtn.LocalLink;
 import locallink.chlwhdtn.Track;
 
@@ -29,7 +29,7 @@ public class WebManager {
 	@SuppressWarnings("unused")
 	private HttpServer server;
 	public final List<ServerWebSocket> clients = new ArrayList<>();
-	public int port = 10426;
+	public int port = 80;
 	public boolean isOpen = false;
 
 	public WebManager() {
@@ -58,16 +58,47 @@ public class WebManager {
 			ws.frameHandler(frame -> {
 
 				String order = frame.textData();
+				String[] cmd = order.split(" ");
 				System.out.println(ws.remoteAddress() + "에게 " + order + " 수신");
 				if (order.equals("connect")) {
-					// 접속 완료 됬을 경우 // 접속 완료 됬을 경우 // 접속 완료 됬을 경우
+					// 접속 완료 됬을 경우
 					clients.add(ws);
 					sendTrack(LocalLink.instance.selectedTrack);
 				}
-				if (order.equals("nextsong")) {
+				if (cmd[0].equals("nextsong")) {
 					LocalLink.instance.selectRight();
-				} else if (order.equals("backsong")) {
+				} else if (cmd[0].equals("backsong")) {
 					LocalLink.instance.selectLeft();
+				} else if (cmd[0].equals("login")) {
+					JsonObject login = new JsonObject();
+					login.addProperty("type", "login");
+					if(AccountManager.login(cmd[1], cmd[2])) {
+						login.addProperty("data", "allow");
+						login.addProperty("name", AccountManager.getAccount(cmd[1]).name);
+					} else {
+						login.addProperty("data", "deny");
+					}
+					ws.writeFinalTextFrame(login.toString());
+				} else if(cmd[0].equals("signup")) {
+					
+					JsonObject signup = new JsonObject();
+					signup.addProperty("type", "signup");
+					if(AccountManager.containsID(cmd[1])) {
+						signup.addProperty("data", "iderr");
+					} else {
+						try {
+							String name = "";
+							for(int i = 2; i < cmd.length-1; i++) {
+								name += " " + cmd[i];								
+							}
+							
+							AccountManager.addAccount(cmd[1], cmd[cmd.length-1], name.trim());
+							signup.addProperty("data", "allow");
+						} catch(Exception e) {
+							signup.addProperty("data", "deny");
+						}
+					}
+					ws.writeFinalTextFrame(signup.toString());
 				}
 			});
 		}).listen(port, result -> {
@@ -82,51 +113,51 @@ public class WebManager {
 	}
 
 	public void sendTrack(Track track) {
-		if(clients.isEmpty())
+		if (clients.isEmpty())
 			return;
-		Thread thread = new Thread(() ->{
+		Thread thread = new Thread(() -> {
 			JsonObject title = new JsonObject();
 			title.addProperty("type", "title");
 			try {
 				title.addProperty("data", track.title);
-			} catch(NullPointerException e) {
-				title.addProperty("data", "재생중인 항목 없음");		
+			} catch (NullPointerException e) {
+				title.addProperty("data", "재생중인 항목 없음");
 			}
-			
+
 			JsonObject album = new JsonObject();
 			album.addProperty("type", "album");
 			try {
 				album.addProperty("data", track.album);
-			} catch(NullPointerException e) {
-				album.addProperty("data", " ");		
+			} catch (NullPointerException e) {
+				album.addProperty("data", " ");
 			}
-			
+
 			JsonObject signer = new JsonObject();
 			signer.addProperty("type", "singer");
 			try {
 				signer.addProperty("data", track.artist);
-			} catch(NullPointerException e) {
-				signer.addProperty("data", " ");	
+			} catch (NullPointerException e) {
+				signer.addProperty("data", " ");
 			}
-			
+
 			JsonObject image = new JsonObject();
 			try {
 				image.addProperty("type", "artwork");
 				image.addProperty("data", encodeToString(track.image));
-			} catch(NullPointerException e) {
+			} catch (NullPointerException e) {
 				image.addProperty("type", "artwork");
-				image.addProperty("data", " ");			
+				image.addProperty("data", " ");
 			}
-			
+
 			JsonObject lyric = new JsonObject();
 			lyric.addProperty("type", "lyric");
 			try {
 				lyric.addProperty("data", track.lyric);
-			} catch(NullPointerException e) {
-				lyric.addProperty("data", " ");			
+			} catch (NullPointerException e) {
+				lyric.addProperty("data", " ");
 			}
-			
-			new ArrayList<>(clients).forEach((client) -> {
+
+			clients.forEach((client) -> {
 				client.writeFinalTextFrame(title.toString());
 				client.writeFinalTextFrame(album.toString());
 				client.writeFinalTextFrame(signer.toString());

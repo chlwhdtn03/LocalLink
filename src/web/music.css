@@ -69,11 +69,6 @@
     width: 50%;
 }
 
-.lyric-content .close {
-    top: 0; 
-    float: right;
-}
-
 .lyric-content p {
     text-align: left;
     color: black;

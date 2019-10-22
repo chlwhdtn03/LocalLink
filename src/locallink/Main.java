@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 
+import locallink.Account.AccountManager;
 import locallink.chlwhdtn.LocalLink;
 
 public class Main {
@@ -16,6 +17,13 @@ public class Main {
 	public static long MEMORY_USAGE = 0;
 
 	public static void main(String[] args) {
+		AccountManager.loadUser();
+		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				AccountManager.saveUser();
+			}
+		}));
 		Thread utilThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
