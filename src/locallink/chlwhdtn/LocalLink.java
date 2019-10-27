@@ -54,6 +54,7 @@ import locallink.Main;
 import locallink.ScreenType;
 import locallink.SettingManager;
 import locallink.Timer;
+import locallink.ToggleButtonUI;
 import locallink.Volume;
 import locallink.WebManager;
 import net.iharder.dnd.FileDrop;
@@ -504,30 +505,19 @@ public class LocalLink extends JFrame {
 
 	private void initOption(boolean init) {
 		if (init) {
-			System.out.println("초기화중 " + SettingManager.Web_Enable);
-			webButton.setBounds(50, 50, 20, 20);
+			webButton.setBounds(50, 50, 50, 20);
 			webButton.setSelected(SettingManager.Web_Enable);
 			webButton.setContentAreaFilled(false);
 			webButton.setBorderPainted(false);
-			webButton.setUI(new BasicButtonUI() {
-				@Override
-				public void paint(Graphics g, JComponent c) {
-					if(SettingManager.Web_Enable) {
-						g.setColor(Color.green);
-						webLabel.setText("웹 서비스를 사용합니다.");
-					} else {
-						g.setColor(Color.red);
-						webLabel.setText("웹 서비스를 사용하지 않습니다.");
-					}
-					g.fillRect(0, 0, 20, 20);
-					super.paint(g, c);
-				}
-			});
+			webButton.setUI(new ToggleButtonUI());
 			webButton.addChangeListener((e) -> {
-				if(webButton.isSelected())
+				if(webButton.isSelected()) {
 					SettingManager.Web_Enable = true;
-				else 
+					webLabel.setText("웹 서비스를 사용합니다.");
+				} else { 
 					SettingManager.Web_Enable = false;
+					webLabel.setText("웹 서비스를 사용하지 않습니다.");
+				}
 				SettingManager.saveConfig();
 			});	
 			
@@ -538,6 +528,9 @@ public class LocalLink extends JFrame {
 			portField.setBounds(50, 150, 100, 25);
 			portField.setBorder(null);
 			portField.setText(SettingManager.Port + "");
+			portField.setFont(new Font("맑은 고딕", 0, 16));
+			portField.setSelectionColor(SystemColor.textHighlight);
+			portField.setBackground(Color.LIGHT_GRAY);
 			portField.getDocument().addDocumentListener(new DocumentListener() {
 				
 				@Override

@@ -6,6 +6,10 @@ body {
     padding-bottom: 3em;
 }
 
+pre {
+    font-family: 'Nanum Gothic', sans-serif;
+}
+
 /* 상단바 CSS */
 
 header {
@@ -73,7 +77,7 @@ header .menu a {
     border: 1px solid gray;
     margin: 5% auto;
     padding: 20px;
-    width: 50%;
+    width: 80%;
 }
 
 #signup-form {
@@ -94,7 +98,7 @@ header .menu a {
     border: 1px solid gray;
     margin: 5% auto;
     padding: 20px;
-    width: 50%;
+    width: 80%;
 }
 
 /* 애니메이션 */
