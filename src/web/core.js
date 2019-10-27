@@ -47,7 +47,7 @@ $(
                 case "login":
                     if (a.data == "allow") {
                         $("#login #notice").text("");
-                        $("#user").text("안녕하세요, " + a.name + " 님!");
+                        $("#user").text(a.name + " 님!");
                         hidelogin();
                     } else if (a.data == "deny") {
                         $("#login #notice").text("아이디 또는 비밀번호가 일치하지 않습니다.");
@@ -73,6 +73,20 @@ $(
             }
         }
     });
+
+function music() {
+    $(".music").show();
+    var li = document.getElementsByTagName("li");
+    li[0].className = "active";
+    li[1].className = undefined;
+}
+
+function transfer() {
+    $(".music").hide();
+    var li = document.getElementsByTagName("li");
+    li[0].className = undefined;
+    li[1].className = "active";
+}
 
 function hidesignup() {
     $("#signup-form").hide();

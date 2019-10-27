@@ -14,7 +14,18 @@
 </head>
 
 <body>
-    <a id="user" onclick="showlogin()">로그인</a>
+
+    <header>
+        <div class="wrapper">
+            <ul class="menu">
+                <li class="active"><a onclick="music()">음악</a></li>
+                <li><a onclick="transfer()">전송</a></li>
+                <li><a id="user" onclick="showlogin()">로그인</a></li>
+            </ul>
+        </div>
+    </header>
+
+    
     <div class="music">
         <img id="image" src="" onerror="this.src='Noimg.png'" onclick="showlyric()">
         <h3><span id="title">재생중인 MP3 없음</span></h3>

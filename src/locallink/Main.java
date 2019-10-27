@@ -17,11 +17,14 @@ public class Main {
 	public static long MEMORY_USAGE = 0;
 
 	public static void main(String[] args) {
+		
+		SettingManager.loadConfig();
 		AccountManager.loadUser();
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				AccountManager.saveUser();
+				SettingManager.saveConfig();
 			}
 		}));
 		Thread utilThread = new Thread(new Runnable() {

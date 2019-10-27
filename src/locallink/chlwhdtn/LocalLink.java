@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -19,9 +20,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import javax.swing.AbstractButton;
 import javax.swing.ImageIcon;
 import javax.swing.JApplet;
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -31,16 +34,25 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.plaf.ButtonUI;
+import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import jdk.internal.org.objectweb.asm.Label;
 import locallink.Delay;
 import locallink.Main;
 import locallink.ScreenType;
+import locallink.SettingManager;
 import locallink.Timer;
 import locallink.Volume;
 import locallink.WebManager;
@@ -72,8 +84,13 @@ public class LocalLink extends JFrame {
 	private JList<String> connect_list = new JList<String>();
 	private JScrollPane connect_scroll = new JScrollPane(connect_list);
 
+	/* Option 화면 요소 */
+	private JToggleButton webButton = new JToggleButton();
+	private JTextField portField = new JTextField();
+	
+	
 	/* MainMenu 화면 요소 */
-	private JButton exitButton = new JButton("나가기");
+	private JButton optionButton = new JButton("설정");
 	private JButton musicButton = new JButton("시작하기");
 	private JPanel musicpanel = new JPanel();
 	private JLabel main_artwork = new JLabel();
@@ -110,7 +127,8 @@ public class LocalLink extends JFrame {
 
 	public LocalLink() {
 
-		wm = new WebManager();
+		if(SettingManager.Web_Enable)
+			wm = new WebManager();
 
 		instance = this;
 		delay.setSyncDelay(true);
@@ -154,6 +172,7 @@ public class LocalLink extends JFrame {
 		});
 
 		// 화면 초기화
+		initOption(true);
 		initGeneral(true);
 		initMain(true);
 		initMusic(true);
@@ -261,11 +280,15 @@ public class LocalLink extends JFrame {
 
 	public void screenDraw(Graphics2D g) {
 		if (nowScreen.equals(ScreenType.MainMenu)) {
-			Vector<String> users = new Vector<String>();
-			wm.clients.forEach(web -> {
-				users.add(web.remoteAddress().toString());
-			});
-			connect_list.setListData(users);
+			try {
+				Vector<String> users = new Vector<String>();
+				wm.clients.forEach(web -> {
+					users.add(web.remoteAddress().toString());
+				});
+				connect_list.setListData(users);
+			} catch (NullPointerException e) {
+				
+			}
 		}
 		if (nowScreen.equals(ScreenType.Music)) {
 			if (tracklist.isEmpty() == false) {
@@ -305,7 +328,7 @@ public class LocalLink extends JFrame {
 		try {
 			wm.sendTrack(tracklist.get(nowSelected));
 		} catch (Exception e) {
-			e.printStackTrace();
+			
 		}
 		setTitle("▶ " + tracklist.get(nowSelected).title);
 		titlelabel.setText("▶ " + tracklist.get(nowSelected).title);
@@ -369,6 +392,9 @@ public class LocalLink extends JFrame {
 			break;
 		case Music:
 			initMusic(false);
+			break;
+		case Option:
+			initOption(false);
 			break;
 		case Chat:
 			break;
@@ -471,6 +497,99 @@ public class LocalLink extends JFrame {
 			
 		}
 	}
+	
+	JLabel webLabel = new JLabel("웹 서비스 사용 여부를 설정합니다."), 
+			portLabel = new JLabel(SettingManager.Port + "번 포트로 접속하게 됩니다."),
+			SettingLabel = new JLabel(SettingManager.file.getAbsoluteFile() + "에 저장되어 있습니다.");
+
+	private void initOption(boolean init) {
+		if (init) {
+			System.out.println("초기화중 " + SettingManager.Web_Enable);
+			webButton.setBounds(50, 50, 20, 20);
+			webButton.setSelected(SettingManager.Web_Enable);
+			webButton.setContentAreaFilled(false);
+			webButton.setBorderPainted(false);
+			webButton.setUI(new BasicButtonUI() {
+				@Override
+				public void paint(Graphics g, JComponent c) {
+					if(SettingManager.Web_Enable) {
+						g.setColor(Color.green);
+						webLabel.setText("웹 서비스를 사용합니다.");
+					} else {
+						g.setColor(Color.red);
+						webLabel.setText("웹 서비스를 사용하지 않습니다.");
+					}
+					g.fillRect(0, 0, 20, 20);
+					super.paint(g, c);
+				}
+			});
+			webButton.addChangeListener((e) -> {
+				if(webButton.isSelected())
+					SettingManager.Web_Enable = true;
+				else 
+					SettingManager.Web_Enable = false;
+				SettingManager.saveConfig();
+			});	
+			
+			webLabel.setBounds(50, 80, 600, 25);
+			webLabel.setForeground(Color.white);
+			webLabel.setFont(new Font("맑은 고딕", 0, 16));
+			
+			portField.setBounds(50, 150, 100, 25);
+			portField.setBorder(null);
+			portField.setText(SettingManager.Port + "");
+			portField.getDocument().addDocumentListener(new DocumentListener() {
+				
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					checkPort();
+				}
+				
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					checkPort();
+				}
+				
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					checkPort();
+				}
+
+				private void checkPort() {
+					int port = SettingManager.Port;
+					try {
+						port = Integer.parseInt(portField.getText());
+						if(port > 65535)
+							throw new NumberFormatException();
+						if(port < 0)
+							throw new NumberFormatException();
+					} catch(NumberFormatException err) {
+						portLabel.setText("포트(숫자) 형식이 아닙니다. 저장하지 않습니다.");
+						return;
+					}
+					SettingManager.Port = port;
+					portLabel.setText(SettingManager.Port + "번 포트로 접속하게 됩니다. 변경사항은 다시시작하면 적용됩니다.");
+					SettingManager.saveConfig();
+				}
+			});
+				
+			portLabel.setBounds(50, 180, 600, 25);
+			portLabel.setForeground(Color.white);
+			portLabel.setFont(new Font("맑은 고딕", 0, 16));
+			
+			SettingLabel.setBounds(50, 550, 600, 25);
+			SettingLabel.setForeground(Color.white);
+			SettingLabel.setFont(new Font("맑은 고딕", 0, 16));
+			
+		} else {
+			add(webButton);
+			add(webLabel);
+			add(portField);
+			add(portLabel);
+			add(SettingLabel);
+		}
+	}
+
 
 	public void initMain(boolean init) {
 		if (init) {
@@ -488,17 +607,17 @@ public class LocalLink extends JFrame {
 				}
 			});
 
-			exitButton.setBounds(30, 300, 100, 50);
-			exitButton.setForeground(Color.WHITE);
-			exitButton.setFont(new Font("맑은 고딕", 0, 16));
-			exitButton.setBorderPainted(false);
-			exitButton.setContentAreaFilled(false);
-			exitButton.setFocusPainted(false);
-			exitButton.setOpaque(true);
-			exitButton.setBackground(SystemColor.textHighlight);
-			exitButton.addActionListener(new ActionListener() {
+			optionButton.setBounds(30, 300, 100, 50);
+			optionButton.setForeground(Color.WHITE);
+			optionButton.setFont(new Font("맑은 고딕", 0, 16));
+			optionButton.setBorderPainted(false);
+			optionButton.setContentAreaFilled(false);
+			optionButton.setFocusPainted(false);
+			optionButton.setOpaque(true);
+			optionButton.setBackground(SystemColor.textHighlight);
+			optionButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					System.exit(0);
+					changeScreen(ScreenType.Option);
 				}
 			});
 
@@ -556,7 +675,7 @@ public class LocalLink extends JFrame {
 			musicpanel.add(main_titlelabel);
 			
 		} else {
-			add(exitButton);
+			add(optionButton);
 			add(musicButton);
 			add(connect_scroll);
 			add(musicpanel);

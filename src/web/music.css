@@ -28,26 +28,6 @@
     color: blue;
 }
 
-@media only screen and (orientation: landscape) {
-    .music img {
-        float: left;
-        line-height: 200px;
-        width: 40%;
-        max-width: 300px;
-    }    
-
-    .music h3 {
-        text-align: center;
-        margin: 16px 0 0 0;
-    }
-    
-    .music p {
-        text-align: center;
-        margin: 0;
-        color: blue;
-    }
-}
-
 #lyric-form {
     position: fixed;
     z-index: 10;

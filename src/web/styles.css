@@ -1,7 +1,49 @@
+
 body {
     font-family: 'Nanum Gothic', sans-serif;
     margin: 8px 0px;
+    padding-top: 50px;
     padding-bottom: 3em;
+}
+
+/* 상단바 CSS */
+
+header {
+    height: 50px;
+    background: #36D1DC;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #5B86E5, #36D1DC);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #5B86E5, #36D1DC); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    
+    position: fixed;
+    width: 100%;
+    z-index: 9;
+    top: 0;
+    left: 0;    
+}
+
+.active {
+    font-size: 1.2rem;
+}
+
+header h1 {
+    color: white;
+}
+
+header ul {
+    padding: 0;
+    text-align: center;
+}
+
+header .menu li {
+    list-style: none;
+    display: inline-block;
+}
+
+
+header .menu a {
+    color: white;
+    padding: 0 15px;
+    display: block;
 }
 
 /* 닫기 CSS */
@@ -11,7 +53,7 @@ body {
     float: right;
 }
 
-
+/* 폼 기본 형태 */
 
 #login-form {
     position: fixed;

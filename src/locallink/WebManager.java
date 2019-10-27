@@ -29,11 +29,10 @@ public class WebManager {
 	@SuppressWarnings("unused")
 	private HttpServer server;
 	public final List<ServerWebSocket> clients = new ArrayList<>();
-	public int port = 80;
 	public boolean isOpen = false;
 
 	public WebManager() {
-		server = Vertx.vertx().createHttpServer(new HttpServerOptions().setPort(port)).requestHandler(req -> {
+		server = Vertx.vertx().createHttpServer(new HttpServerOptions().setPort(SettingManager.Port)).requestHandler(req -> {
 
 			try (InputStream in = getClass()
 					.getResourceAsStream("/web" + (req.path().equals("/") ? "/index.html" : req.path()))) {
@@ -101,12 +100,12 @@ public class WebManager {
 					ws.writeFinalTextFrame(signup.toString());
 				}
 			});
-		}).listen(port, result -> {
+		}).listen(SettingManager.Port, result -> {
 			if (result.succeeded()) {
-				System.out.println(port + " 포트로 개방 성공");
+				System.out.println(SettingManager.Port + " 포트로 개방 성공");
 				isOpen = true;
 			} else {
-				System.out.println(port + " 포트로 개방 실패");
+				System.out.println(SettingManager.Port + " 포트로 개방 실패");
 			}
 		});
 
