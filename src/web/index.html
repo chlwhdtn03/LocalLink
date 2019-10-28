@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="music.css">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="file.css">
     <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic&display=swap" rel="stylesheet">
     <meta charset="UTF-8">
     <title>LocalLink</title>
@@ -39,6 +40,14 @@
         </div>
     </div>
     
+    <div class="file" style="display: none;">
+        <form id="file-upload">
+            <input class="upload-name" value="파일선택" disabled="disabled"> 
+            <label for="files">업로드</label> 
+            <input type="file" id="files" class="upload-hidden" multiple>
+        </form>
+    </div>
+
     <nav>
         <div class="navimg"></div>
         <div class="navinfo">

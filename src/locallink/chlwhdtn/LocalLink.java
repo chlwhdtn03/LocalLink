@@ -17,6 +17,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -500,6 +502,7 @@ public class LocalLink extends JFrame {
 	}
 	
 	JLabel webLabel = new JLabel("웹 서비스 사용 여부를 설정합니다."), 
+			ipLabel = new JLabel(),
 			portLabel = new JLabel(SettingManager.Port + "번 포트로 접속하게 됩니다."),
 			SettingLabel = new JLabel(SettingManager.file.getAbsoluteFile() + "에 저장되어 있습니다.");
 
@@ -524,6 +527,19 @@ public class LocalLink extends JFrame {
 			webLabel.setBounds(50, 80, 600, 25);
 			webLabel.setForeground(Color.white);
 			webLabel.setFont(new Font("맑은 고딕", 0, 16));
+			
+			String strIpAdress = "localhost";
+			try {
+				InetAddress inetAddress = InetAddress.getLocalHost();
+				strIpAdress = inetAddress.getHostAddress();
+			} catch (UnknownHostException e1) {
+				e1.printStackTrace();
+			}
+			
+			ipLabel.setBounds(50, 110, 600, 25);
+			ipLabel.setText(strIpAdress);
+			ipLabel.setForeground(Color.white);
+			ipLabel.setFont(new Font("맑은 고딕", 0, 16));
 			
 			portField.setBounds(50, 150, 100, 25);
 			portField.setBorder(null);
@@ -577,9 +593,11 @@ public class LocalLink extends JFrame {
 		} else {
 			add(webButton);
 			add(webLabel);
+			add(ipLabel);
 			add(portField);
 			add(portLabel);
 			add(SettingLabel);
+			
 		}
 	}
 

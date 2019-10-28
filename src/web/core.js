@@ -12,6 +12,11 @@ $(
                 webSocket.send("login " + $("#login input[name=id]").val() + " " + $("#login input[name=password]").val());
             }
         );
+        $("#file-upload").submit(
+            function (e) {
+                e.preventDefault();
+            }
+        );
         $("#signup").submit(
             function (e) {
                 e.preventDefault();
@@ -22,6 +27,13 @@ $(
                 webSocket.send("signup " + $("#signup input[name=id]").val() + " " + $("#signup input[name=name]").val() + " " + $("#signup input[name=password]").val());
             }
         );
+        $("#files").on('change', function() {
+            if($(this)[0].files.length == 1)
+                $(".upload-name").val($(this)[0].files[0].name);
+            else
+                $(".upload-name").val($(this)[0].files.length + "개의 파일");
+            
+        });
 
 
         webSocket = new WebSocket("ws://" + location.host + "/LoalLink");
@@ -48,6 +60,7 @@ $(
                     if (a.data == "allow") {
                         $("#login #notice").text("");
                         $("#user").text(a.name + " 님!");
+                        user = a.name;
                         hidelogin();
                     } else if (a.data == "deny") {
                         $("#login #notice").text("아이디 또는 비밀번호가 일치하지 않습니다.");
@@ -76,6 +89,7 @@ $(
 
 function music() {
     $(".music").show();
+    $(".file").hide();
     var li = document.getElementsByTagName("li");
     li[0].className = "active";
     li[1].className = undefined;
@@ -83,6 +97,7 @@ function music() {
 
 function transfer() {
     $(".music").hide();
+    $(".file").show();
     var li = document.getElementsByTagName("li");
     li[0].className = undefined;
     li[1].className = "active";
