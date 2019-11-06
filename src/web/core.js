@@ -1,4 +1,6 @@
 
+var isUploaded;
+var isFileSize = false;
 var user;
 
 $(
@@ -15,6 +17,46 @@ $(
         $("#file-upload").submit(
             function (e) {
                 e.preventDefault();
+                if(!isUploaded) {
+                    alert("업로드된 파일이 없습니다.");
+                    return;
+                }
+                if(!isFileSize) {
+                    alert("파일의 용량이 너무 큽니다.");
+                    return;
+                }
+
+                var date = new Date();
+                var random = Math.floor(Math.random() * 100) + 1;
+                var id = date.getTime();
+                id = id + "-" + random;
+                var defaultype = webSocket.binaryType;
+                webSocket.binaryType = "arraybuffer";
+                webSocket.send("transfer head " + id);
+                for(var i = 0; i < $("#files")[0].files.length; i++) {
+                    getBase64($("#files")[0].files[i], function(e) {
+                        webSocket.send("transfer " + id + " " + e.target.result);
+                    });
+                }
+                webSocket.binaryType = defaultype;
+
+ 
+                alert("정상적으로 업로드 되었습니다.");
+                /* 업로드 이후 Input 초기화 */
+                var agent = navigator.userAgent.toLowerCase();
+                if ( (navigator.appName == 'Netscape' && navigator.userAgent.search('Trident') != -1) || (agent.indexOf("msie") != -1) ){
+                    // ie 일때 input[type=file] init.
+                    $("#files").replaceWith( $("#files").clone(true) );
+                    $("#parentCreateGroupFullName").val("");
+                } else {
+                    //other browser 일때 input[type=file] init.
+                    $("#files").val("");
+                    $("#parentCreateGroupFullName").val("");
+                }
+                $(".upload-name").val(undefined);
+                $("#file-warning").text("");
+                isFileSize = false;
+                isUploaded = false;
             }
         );
         $("#signup").submit(
@@ -28,11 +70,45 @@ $(
             }
         );
         $("#files").on('change', function() {
-            if($(this)[0].files.length == 1)
+                        
+            if($(this)[0].files.length == 1) {
                 $(".upload-name").val($(this)[0].files[0].name);
-            else
+                isUploaded = true;
+            } else if($(this)[0].files.length == 0)  {
+                $(".upload-name").val(undefined);
+                isUploaded = false;
+            } else {
                 $(".upload-name").val($(this)[0].files.length + "개의 파일");
-            
+                isUploaded = true;
+            }
+            var totalsize = 0;
+            for(var i = 0; i < $(this)[0].files.length; i++) {
+                totalsize += $(this)[0].files[i].size;
+            }
+            var Unit = ["B", "KB", "MB", "GB", "TB", "PB", "EB"];
+            var i;
+            for(i = 0; totalsize / 1024 >= 1; i++) {
+                totalsize /= 1024;
+                totalsize = totalsize.toFixed(2);
+            }
+            if(i > 2) {
+                isFileSize = false;
+                $("#file-warning").text("파일을 업로드 할 수 없습니다. " + totalsize + Unit[i]);
+                $("#file-warning")[0].style.color = "red";
+                return;
+            } 
+            if (i == 2) {
+                if(totalsize > 55) {
+                    isFileSize = false;
+                    $("#file-warning").text("파일을 업로드 할 수 없습니다. " + totalsize + Unit[i]);
+                    $("#file-warning")[0].style.color = "red";
+                    return;
+                }
+            }
+            isFileSize = true;
+            $("#file-warning").text(totalsize + Unit[i]);
+            $("#file-warning")[0].style.color = "black";
+
         });
 
 
@@ -86,6 +162,12 @@ $(
             }
         }
     });
+
+function getBase64(file, onLoadCallback) {
+    var reader = new FileReader();
+    reader.onload = onLoadCallback;
+    reader.readAsArrayBuffer(file);
+}
 
 function music() {
     $(".music").show();

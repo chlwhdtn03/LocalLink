@@ -15,11 +15,14 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionAdapter;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.AbstractButton;
@@ -50,6 +53,12 @@ import javax.swing.plaf.basic.BasicButtonUI;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 import javax.swing.plaf.basic.BasicSliderUI;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.WriterException;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
+
 import jdk.internal.org.objectweb.asm.Label;
 import locallink.Delay;
 import locallink.Main;
@@ -70,11 +79,13 @@ public class LocalLink extends JFrame {
 	private ScreenType nowScreen = ScreenType.MainMenu;
 	private Point mouseDownCompCoords = null;
 	private WebManager wm;
+	public BufferedImage qrcode;
 
 	/* 리소스 */
 	private Image screenImage; // JFrame을 초기화
 	private Graphics screenGraphic; // JFrame을 꾸밀 수 있게 초기화
 	private Image Background; // (정보창) 회색 배경
+	private ImageIcon NoIMG; // 이미지 없음
 	private ImageIcon min_exit, min_enter;
 	private ImageIcon close_exit, close_enter;
 	private ImageIcon home_exit, home_enter;
@@ -83,9 +94,7 @@ public class LocalLink extends JFrame {
 	private JButton btnX = new JButton();
 	private JButton btnM = new JButton();
 	private JButton btnH = new JButton();
-	/* Main 화면 요소 */
-	private JList<String> connect_list = new JList<String>();
-	private JScrollPane connect_scroll = new JScrollPane(connect_list);
+
 
 	/* Option 화면 요소 */
 	private JToggleButton webButton = new JToggleButton();
@@ -93,14 +102,27 @@ public class LocalLink extends JFrame {
 	
 	
 	/* MainMenu 화면 요소 */
+	private JList<String> connect_list = new JList<String>();
+	private JScrollPane connect_scroll = new JScrollPane(connect_list);
 	private JButton optionButton = new JButton("설정");
-	private JButton musicButton = new JButton("시작하기");
 	private JPanel musicpanel = new JPanel();
 	private JLabel main_artwork = new JLabel();
 	private JLabel main_titlelabel = new JLabel("재생중인 MP3 없음");
+	private JLabel QR_label = new JLabel("QR코드");
+	private JLabel main_recent_title = new JLabel("최근 재생목록");
+	private JLabel main_recent_artwork_1 = new JLabel();
+	private JLabel main_recent_artwork_2 = new JLabel();
+	private JLabel main_recent_artwork_3 = new JLabel();
+	private JLabel main_recent_1 = new JLabel();
+	private JLabel main_recent_2 = new JLabel();
+	private JLabel main_recent_3 = new JLabel();
+	private JLabel File_title = new JLabel("최근 수신된 파일");
+	private JScrollPane File_panel = new JScrollPane();
+	private JLabel Chat_title = new JLabel("최근 수신된 메세지");
+	private JScrollPane Chat_panel = new JScrollPane();
 			
 	/* Music 유틸 */
-	ArrayList<Track> tracklist = new ArrayList<Track>();
+	public List<Track> tracklist = new ArrayList<Track>();
 	public Music selectedMusic;
 	public boolean lyricmode = false;
 	public int nowSelected = 0;
@@ -127,12 +149,22 @@ public class LocalLink extends JFrame {
 	public static Game game;
 	private Thread gameThread;
 	protected boolean pause = false;
-
 	public LocalLink() {
 
-		if(SettingManager.Web_Enable)
+		if(SettingManager.Web_Enable) {
 			wm = new WebManager();
-
+			try {
+				
+				QRCodeWriter qrCodeWriter = new QRCodeWriter();
+				BitMatrix bitMatrix = qrCodeWriter.encode("http://" + InetAddress.getLocalHost().getHostAddress(), BarcodeFormat.QR_CODE, 100, 100);
+				qrcode = MatrixToImageWriter.toBufferedImage(bitMatrix);
+				
+			} catch (UnknownHostException | WriterException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+		}
+		
 		instance = this;
 		delay.setSyncDelay(true);
 
@@ -144,6 +176,9 @@ public class LocalLink extends JFrame {
 		
 		home_exit = new ImageIcon(Main.class.getResource("/Home_Exit.png"));
 		home_enter = new ImageIcon(Main.class.getResource("/Home_Enter.png"));
+		
+		NoIMG = new ImageIcon(Main.class.getResource("/web/Noimg.png"));
+		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
 
 		setUndecorated(true); // 테두리 상단창 삭제
 		setTitle("LocalLink");
@@ -181,9 +216,6 @@ public class LocalLink extends JFrame {
 		initMusic(true);
 
 		changeScreen(ScreenType.MainMenu);
-
-		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
-
 		new FileDrop(this, new FileDrop.Listener() {
 			public void filesDropped(java.io.File[] files) {
 				if (nowScreen.equals(ScreenType.Music)) {
@@ -284,6 +316,9 @@ public class LocalLink extends JFrame {
 	public void screenDraw(Graphics2D g) {
 		if (nowScreen.equals(ScreenType.MainMenu)) {
 			try {
+				g.setColor(Color.darkGray);
+				g.fillRect(0, 0, 800, 600);
+				
 				Vector<String> users = new Vector<String>();
 				wm.clients.forEach(web -> {
 					users.add(web.remoteAddress().toString());
@@ -297,7 +332,6 @@ public class LocalLink extends JFrame {
 			if (tracklist.isEmpty() == false) {
 				g.drawImage(tracklist.get(nowSelected).image, 0, -100, null);
 			}
-			g.drawImage(Background, 0, 0, 800, 30, null);
 			g.drawImage(Background, 150, 70, 500, 500, null);
 			g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			g.setFont(new Font("맑은 고딕", 0, 20));
@@ -316,6 +350,7 @@ public class LocalLink extends JFrame {
 				e.printStackTrace();
 			}
 		}
+		g.drawImage(Background, 0, 0, 800, 30, null); // 상단 메뉴 배경
 		g.setColor(Color.white);
 		g.setFont(new Font("맑은 고딕", Font.PLAIN, 20));
 		g.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -348,7 +383,7 @@ public class LocalLink extends JFrame {
 			main_artwork.setIcon(null);
 			checklyric(true);
 		} else {
-			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH));
+			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(300, 300, Image.SCALE_SMOOTH));
 			artwork.setIcon(art);
 			main_artwork.setIcon(art);
 			checklyric(false);
@@ -489,11 +524,17 @@ public class LocalLink extends JFrame {
 			btnH.setIcon(home_exit);
 			btnH.setFocusable(false);
 			btnH.setBounds(0, 0, 30, 30);
+			
+			titlelabel.setBounds(150, 5, 500, 20);
+			titlelabel.setHorizontalAlignment(SwingConstants.CENTER);
+			titlelabel.setForeground(Color.WHITE);
+			titlelabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
+			titlelabel.setVisible(true);
 
 			addKeyListener(new GameKeyListener());
 
 		} else {
-
+			add(titlelabel);
 			add(btnX);
 			add(btnM);
 			add(btnH);
@@ -604,21 +645,10 @@ public class LocalLink extends JFrame {
 
 	public void initMain(boolean init) {
 		if (init) {
-			musicButton.setBounds(30, 200, 100, 50);
-			musicButton.setForeground(Color.WHITE);
-			musicButton.setFont(new Font("맑은 고딕", 0, 16));
-			musicButton.setBorderPainted(false);
-			musicButton.setContentAreaFilled(false);
-			musicButton.setFocusPainted(false);
-			musicButton.setOpaque(true);
-			musicButton.setBackground(SystemColor.textHighlight);
-			musicButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					changeScreen(ScreenType.Music);
-				}
-			});
-
-			optionButton.setBounds(30, 300, 100, 50);
+			// 800 600
+			
+			
+			optionButton.setBounds(450, 450, 100, 100);
 			optionButton.setForeground(Color.WHITE);
 			optionButton.setFont(new Font("맑은 고딕", 0, 16));
 			optionButton.setBorderPainted(false);
@@ -631,6 +661,24 @@ public class LocalLink extends JFrame {
 					changeScreen(ScreenType.Option);
 				}
 			});
+			
+
+			QR_label.setBounds(650, 450, 100, 100);
+			QR_label.setIcon(new ImageIcon(qrcode));
+			
+			File_title.setBounds(50, 265, 325, 25);
+			File_title.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			File_title.setForeground(Color.white);
+			File_title.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			File_panel.setBounds(50, 300, 325, 100);
+			
+			Chat_title.setBounds(50, 415, 325, 25);
+			Chat_title.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			Chat_title.setForeground(Color.white);
+			Chat_title.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			Chat_panel.setBounds(50, 450, 325, 100);
 
 			connect_scroll.setBounds(175, 175, 200, 250);
 			connect_scroll.setBackground(Color.DARK_GRAY);
@@ -669,26 +717,110 @@ public class LocalLink extends JFrame {
 			connect_list.setBackground(Color.DARK_GRAY);
 			connect_list.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
 			connect_list.setForeground(Color.white);
-
 			
+			main_recent_title.setBounds(50, 50, 325, 25);
+			main_recent_title.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			main_recent_title.setForeground(Color.white);
+			main_recent_title.setHorizontalAlignment(SwingConstants.CENTER);
 			
-			musicpanel.setBounds(500, 175, 275, 300);
+			main_recent_artwork_1.setBounds(50,100,100,100);
+			main_recent_artwork_1.setIcon(NoIMG);
+			
+			main_recent_1.setBounds(50, 210, 100, 25);
+			main_recent_1.setText("없음");
+			main_recent_1.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			main_recent_1.setForeground(Color.white);
+			main_recent_1.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			main_recent_artwork_2.setBounds(163,100,100,100);
+			main_recent_artwork_2.setIcon(NoIMG);
+			
+			main_recent_2.setBounds(163, 210, 100, 25);
+			main_recent_2.setText("없음");
+			main_recent_2.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			main_recent_2.setForeground(Color.white);
+			main_recent_2.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			main_recent_artwork_3.setBounds(275,100,100,100);
+			main_recent_artwork_3.setIcon(NoIMG);
+			
+			main_recent_3.setBounds(275, 210, 100, 25);
+			main_recent_3.setText("없음");
+			main_recent_3.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			main_recent_3.setForeground(Color.white);
+			main_recent_3.setHorizontalAlignment(SwingConstants.CENTER);
+			
+			List<Track> list = PlayListManager.loadHeader();
+			for(int i = 0; i < list.size(); i++) {
+				if(i == 0) {
+					main_recent_1.setText(list.get(i).title);
+					main_recent_artwork_1.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_FAST)));
+					main_recent_artwork_1.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							tracklist = PlayListManager.loadTrackList(1);
+							selectTrack(0);
+						}
+					});
+				}
+				if(i == 1) {
+					main_recent_2.setText(list.get(i).title);
+					main_recent_artwork_2.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_FAST)));
+					main_recent_artwork_2.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							tracklist = PlayListManager.loadTrackList(2);
+							selectTrack(0);
+						}
+					});
+				}
+				if(i == 2) {
+					main_recent_3.setText(list.get(i).title);
+					main_recent_artwork_3.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_FAST)));
+					main_recent_artwork_3.addMouseListener(new MouseAdapter() {
+						@Override
+						public void mouseClicked(MouseEvent e) {
+							tracklist = PlayListManager.loadTrackList(3);
+							selectTrack(0);
+						}
+					});
+				}
+			}
+			
+			musicpanel.setBounds(450, 50, 300, 350);
 			musicpanel.setLayout(null);
+			musicpanel.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					changeScreen(ScreenType.Music);
+				}
+			});
+//			musicpanel.setBackground(new Color(0, 0, 0, 0));
+			main_artwork.setBounds(0,0,300,300);
 			
-			main_artwork.setBounds((musicpanel.getWidth() - 250) / 2,0,250,250);
-			
-			main_titlelabel.setBounds(0,250,275,50);
+			main_titlelabel.setBounds(0,300,300,50);
 			main_titlelabel.setHorizontalAlignment(SwingConstants.CENTER);
 			main_titlelabel.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
-			main_titlelabel.setForeground(Color.black);
+//			main_titlelabel.setForeground(Color.white);
 			
 			musicpanel.add(main_artwork);
 			musicpanel.add(main_titlelabel);
 			
 		} else {
+			add(main_recent_title);
+			add(main_recent_artwork_1);
+			add(main_recent_1);
+			add(main_recent_artwork_2);
+			add(main_recent_2);
+			add(main_recent_artwork_3);
+			add(main_recent_3);
 			add(optionButton);
-			add(musicButton);
-			add(connect_scroll);
+			add(QR_label);
+			add(File_panel);
+			add(File_title);
+			add(Chat_title);
+			add(Chat_panel);
+//			add(connect_scroll);
 			add(musicpanel);
 		}
 	}
@@ -784,15 +916,14 @@ public class LocalLink extends JFrame {
 			playButton.setBackground(new Color(255, 255, 255, 100));
 			playButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					if(selectedMusic == null) {
+						selectTrack(0);
+						return;
+					}
 					selectedMusic.setLock(!selectedMusic.getLock());
+					playButton.setText(selectedMusic.getLock() ? "재생" : "일시정지");
 				}
 			});
-
-			titlelabel.setBounds(150, 5, 500, 20);
-			titlelabel.setHorizontalAlignment(SwingConstants.CENTER);
-			titlelabel.setForeground(Color.WHITE);
-			titlelabel.setFont(new Font("맑은 고딕", Font.BOLD, 16));
-			titlelabel.setVisible(true);
 
 			showlyricButton.setBounds(600, 70, 50, 25);
 			showlyricButton.setForeground(Color.WHITE);
@@ -903,7 +1034,6 @@ public class LocalLink extends JFrame {
 			add(nowtime);
 			add(songinfo);
 			add(showlyricButton);
-			add(titlelabel);
 			add(playButton);
 			add(backButton);
 			add(nextButton);

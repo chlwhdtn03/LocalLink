@@ -13,5 +13,7 @@
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/vertx-core-3.8.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/commons-codec-1.9.jar"/>
 	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/sqlite-jdbc-3.27.2.1.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/core-3.3.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Choi/eclipse/workspace/LocalLink/javase-3.3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

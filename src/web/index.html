@@ -42,9 +42,12 @@
     
     <div class="file" style="display: none;">
         <form id="file-upload">
-            <input class="upload-name" value="파일선택" disabled="disabled"> 
+            <input class="upload-name" disabled="disabled"> 
             <label for="files">업로드</label> 
+            <p id="file-warning"></p>
+            <p>한번에 50MB를 넘게 전송할 수 없습니다.</p>
             <input type="file" id="files" class="upload-hidden" multiple>
+            <button type="submit" id="upload">전송하기</button>
         </form>
     </div>
 

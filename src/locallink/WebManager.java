@@ -3,13 +3,29 @@ package locallink;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -30,6 +46,7 @@ public class WebManager {
 	private HttpServer server;
 	public final List<ServerWebSocket> clients = new ArrayList<>();
 	public boolean isOpen = false;
+	public HashMap<String, File> FileIDList = new HashMap<String, File>();
 
 	public WebManager() {
 		server = Vertx.vertx().createHttpServer(new HttpServerOptions().setPort(SettingManager.Port)).requestHandler(req -> {
@@ -98,6 +115,44 @@ public class WebManager {
 						}
 					}
 					ws.writeFinalTextFrame(signup.toString());
+				} else if(cmd[0].equals("transfer")) {
+					if(cmd[1].equals("head")) {
+						// : transfer head <ID> <description>
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-kkmmss-");
+						File savetmp;
+						do {
+							savetmp = new File("Download/" + sdf.format(new Date()) + new Random().nextInt(10) + "/");
+						} while(savetmp.isDirectory());
+						savetmp.mkdirs();
+						File headerFile = new File(savetmp.getAbsolutePath() + "/header.txt");
+						try {
+							FileIDList.put(cmd[2], savetmp);
+							BufferedWriter bw = new BufferedWriter(new FileWriter(headerFile));
+							bw.write(cmd[2] + "\n");
+							bw.flush();
+							bw.write(ws.remoteAddress().toString() + "\n");
+							bw.flush();
+							bw.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if(FileIDList.containsKey(cmd[1])) {
+						try {
+							String base64 = cmd[2].split(",")[1];
+							byte[] Bytes = DatatypeConverter.parseBase64Binary(base64);
+							Path destinationFile = Paths.get(FileIDList.get(cmd[1]).getPath(), "test.png");
+							Files.write(destinationFile, Bytes);
+//							Charset charset = Charset.forName("UTF-8");
+//							ByteBuffer bb = charset.encode(cmd[2]);
+//							FileChannel fc = new FileOutputStream("test.png").getChannel();
+//							fc.write(bb);
+//							fc.close();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 				}
 			});
 		}).listen(SettingManager.Port, result -> {

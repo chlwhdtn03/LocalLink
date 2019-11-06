@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 
 import locallink.Account.AccountManager;
 import locallink.chlwhdtn.LocalLink;
+import locallink.chlwhdtn.PlayListManager;
 
 public class Main {
 	public static final int WIDTH = 800;
@@ -25,6 +26,7 @@ public class Main {
 			public void run() {
 				AccountManager.saveUser();
 				SettingManager.saveConfig();
+				PlayListManager.save();
 			}
 		}));
 		Thread utilThread = new Thread(new Runnable() {
