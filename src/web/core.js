@@ -30,15 +30,22 @@ $(
                 var random = Math.floor(Math.random() * 100) + 1;
                 var id = date.getTime();
                 id = id + "-" + random;
-                var defaultype = webSocket.binaryType;
-                webSocket.binaryType = "arraybuffer";
+                var filearray = new Array();
                 webSocket.send("transfer head " + id);
                 for(var i = 0; i < $("#files")[0].files.length; i++) {
+                    filearray[i] = $("#files")[0].files[i].name;
+                    console.log(filearray[i]);
+                }
+                var count = 0;
+                for(var i = 0; i < $("#files")[0].files.length; i++) {
                     getBase64($("#files")[0].files[i], function(e) {
-                        webSocket.send("transfer " + id + " " + e.target.result);
+                        webSocket.send("transfer " + id + " " + e.target.result + " " + filearray[count]);
+                        count++;
+                        if(count == filearray.length) {
+                            webSocket.send("transfer end " + id);
+                        }
                     });
                 }
-                webSocket.binaryType = defaultype;
 
  
                 alert("정상적으로 업로드 되었습니다.");
@@ -166,7 +173,7 @@ $(
 function getBase64(file, onLoadCallback) {
     var reader = new FileReader();
     reader.onload = onLoadCallback;
-    reader.readAsArrayBuffer(file);
+    reader.readAsDataURL(file);
 }
 
 function music() {

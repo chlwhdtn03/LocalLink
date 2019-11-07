@@ -117,7 +117,7 @@ public class WebManager {
 					ws.writeFinalTextFrame(signup.toString());
 				} else if(cmd[0].equals("transfer")) {
 					if(cmd[1].equals("head")) {
-						// : transfer head <ID> <description>
+						// : transfer head <ID>
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd-kkmmss-");
 						File savetmp;
 						do {
@@ -137,12 +137,22 @@ public class WebManager {
 							e.printStackTrace();
 						}
 					}
+					if(cmd[1].equals("end")) {
+						FileIDList.remove(cmd[2]);
+					}
 					if(FileIDList.containsKey(cmd[1])) {
 						try {
 							String base64 = cmd[2].split(",")[1];
 							byte[] Bytes = DatatypeConverter.parseBase64Binary(base64);
-							Path destinationFile = Paths.get(FileIDList.get(cmd[1]).getPath(), "test.png");
+							String filename = "";
+							for(int i = 3; i < cmd.length; i++) {
+								filename += cmd[i] + " ";
+							}
+							filename = filename.trim();
+							Path destinationFile = Paths.get(FileIDList.get(cmd[1]).getPath(), filename);
 							Files.write(destinationFile, Bytes);
+							LocalLink.instance.File_area.append(filename + "\n");
+							LocalLink.instance.File_area.setCaretPosition(LocalLink.instance.File_area.getDocument().getLength());
 //							Charset charset = Charset.forName("UTF-8");
 //							ByteBuffer bb = charset.encode(cmd[2]);
 //							FileChannel fc = new FileOutputStream("test.png").getChannel();

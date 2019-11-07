@@ -36,6 +36,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JProgressBar;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
 import javax.swing.JTextArea;
@@ -89,9 +90,11 @@ public class LocalLink extends JFrame {
 	private ImageIcon min_exit, min_enter;
 	private ImageIcon close_exit, close_enter;
 	private ImageIcon home_exit, home_enter;
+	private ImageIcon option_exit, option_enter;
 
 	/* 공통 요소 */
 	private JButton btnX = new JButton();
+	private JButton btnOption = new JButton();
 	private JButton btnM = new JButton();
 	private JButton btnH = new JButton();
 
@@ -104,7 +107,6 @@ public class LocalLink extends JFrame {
 	/* MainMenu 화면 요소 */
 	private JList<String> connect_list = new JList<String>();
 	private JScrollPane connect_scroll = new JScrollPane(connect_list);
-	private JButton optionButton = new JButton("설정");
 	private JPanel musicpanel = new JPanel();
 	private JLabel main_artwork = new JLabel();
 	private JLabel main_titlelabel = new JLabel("재생중인 MP3 없음");
@@ -117,9 +119,11 @@ public class LocalLink extends JFrame {
 	private JLabel main_recent_2 = new JLabel();
 	private JLabel main_recent_3 = new JLabel();
 	private JLabel File_title = new JLabel("최근 수신된 파일");
-	private JScrollPane File_panel = new JScrollPane();
+	public JTextArea File_area = new JTextArea();
+	private JScrollPane File_panel = new JScrollPane(File_area);
 	private JLabel Chat_title = new JLabel("최근 수신된 메세지");
-	private JScrollPane Chat_panel = new JScrollPane();
+	private JTextArea Chat_area = new JTextArea();
+	private JScrollPane Chat_panel = new JScrollPane(Chat_area);
 			
 	/* Music 유틸 */
 	public List<Track> tracklist = new ArrayList<Track>();
@@ -132,8 +136,8 @@ public class LocalLink extends JFrame {
 	JPopupMenu menu = new JPopupMenu(); // 스피커
 	private JButton nextButton = new JButton(">>");
 	private JButton backButton = new JButton("<<");
+	private JButton VolButton = new JButton("V");
 	private JButton showlyricButton = new JButton("가사");
-	private JButton btnOption = new JButton();
 	private JLabel titlelabel = new JLabel("LocalLink");
 	private JLabel artwork = new JLabel();
 	private JLabel songinfo = new JLabel("MP3 파일을 이곳에 드래그하세요!");
@@ -156,7 +160,11 @@ public class LocalLink extends JFrame {
 			try {
 				
 				QRCodeWriter qrCodeWriter = new QRCodeWriter();
-				BitMatrix bitMatrix = qrCodeWriter.encode("http://" + InetAddress.getLocalHost().getHostAddress(), BarcodeFormat.QR_CODE, 100, 100);
+				BitMatrix bitMatrix;
+				if(SettingManager.Port != 80)
+					bitMatrix = qrCodeWriter.encode("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + SettingManager.Port, BarcodeFormat.QR_CODE, 100, 100);
+				else
+					bitMatrix = qrCodeWriter.encode("http://" + InetAddress.getLocalHost().getHostAddress(), BarcodeFormat.QR_CODE, 100, 100);
 				qrcode = MatrixToImageWriter.toBufferedImage(bitMatrix);
 				
 			} catch (UnknownHostException | WriterException e1) {
@@ -176,6 +184,10 @@ public class LocalLink extends JFrame {
 		
 		home_exit = new ImageIcon(Main.class.getResource("/Home_Exit.png"));
 		home_enter = new ImageIcon(Main.class.getResource("/Home_Enter.png"));
+		
+		option_exit = new ImageIcon(new ImageIcon(Main.class.getResource("/Option_Exit.png")).getImage().getScaledInstance(20, 20, Image.SCALE_AREA_AVERAGING));
+		option_enter = new ImageIcon(new ImageIcon(Main.class.getResource("/Option_Enter.png")).getImage().getScaledInstance(20, 20, Image.SCALE_AREA_AVERAGING));
+		
 		
 		NoIMG = new ImageIcon(Main.class.getResource("/web/Noimg.png"));
 		Background = new ImageIcon(Main.class.getResource("/images/background.png")).getImage();
@@ -281,7 +293,7 @@ public class LocalLink extends JFrame {
 		artwork.setVisible(false);
 		timebar.setVisible(false);
 		nowtime.setVisible(false);
-		btnOption.setVisible(false);
+		VolButton.setVisible(false);
 		showlyricButton.setVisible(false);
 	}
 
@@ -319,11 +331,11 @@ public class LocalLink extends JFrame {
 				g.setColor(Color.darkGray);
 				g.fillRect(0, 0, 800, 600);
 				
-				Vector<String> users = new Vector<String>();
-				wm.clients.forEach(web -> {
-					users.add(web.remoteAddress().toString());
-				});
-				connect_list.setListData(users);
+//				Vector<String> users = new Vector<String>();
+//				wm.clients.forEach(web -> {
+//					users.add(web.remoteAddress().toString());
+//				});
+//				connect_list.setListData(users);
 			} catch (NullPointerException e) {
 				
 			}
@@ -383,9 +395,10 @@ public class LocalLink extends JFrame {
 			main_artwork.setIcon(null);
 			checklyric(true);
 		} else {
-			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(300, 300, Image.SCALE_SMOOTH));
+			ImageIcon art = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(250, 250, Image.SCALE_SMOOTH));
 			artwork.setIcon(art);
-			main_artwork.setIcon(art);
+			ImageIcon mainart = new ImageIcon(tracklist.get(nowSelected).image.getScaledInstance(300, 300, Image.SCALE_SMOOTH));
+			main_artwork.setIcon(mainart);
 			checklyric(false);
 		}
 		lyric.setText(tracklist.get(nowSelected).lyric);
@@ -464,7 +477,7 @@ public class LocalLink extends JFrame {
 				}
 
 				@Override
-				public void mouseReleased(MouseEvent e) {
+				public void mouseClicked(MouseEvent e) {
 					System.exit(0);
 				}
 			});
@@ -489,7 +502,7 @@ public class LocalLink extends JFrame {
 				}
 
 				@Override
-				public void mouseReleased(MouseEvent e) {
+				public void mouseClicked(MouseEvent e) {
 					setState(JFrame.ICONIFIED);
 				}
 			});
@@ -514,7 +527,7 @@ public class LocalLink extends JFrame {
 				}
 
 				@Override
-				public void mouseReleased(MouseEvent e) {
+				public void mouseClicked(MouseEvent e) {
 					changeScreen(ScreenType.MainMenu);
 				}
 			});
@@ -524,6 +537,33 @@ public class LocalLink extends JFrame {
 			btnH.setIcon(home_exit);
 			btnH.setFocusable(false);
 			btnH.setBounds(0, 0, 30, 30);
+			
+
+			
+			btnOption.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+			btnOption.setBorder(null);
+			btnOption.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					btnOption.setIcon(option_enter);
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					btnOption.setIcon(option_exit);
+				}
+
+				@Override
+				public void mouseClicked(MouseEvent e) {
+					changeScreen(ScreenType.Option);
+				}
+			});
+			btnOption.setOpaque(false);
+			btnOption.setContentAreaFilled(false);
+			btnOption.setBorderPainted(false);
+			btnOption.setIcon(option_exit);
+			btnOption.setFocusable(false);
+			btnOption.setBounds(30, 0, 30, 30);
 			
 			titlelabel.setBounds(150, 5, 500, 20);
 			titlelabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -536,6 +576,7 @@ public class LocalLink extends JFrame {
 		} else {
 			add(titlelabel);
 			add(btnX);
+			add(btnOption);
 			add(btnM);
 			add(btnH);
 			
@@ -648,20 +689,6 @@ public class LocalLink extends JFrame {
 			// 800 600
 			
 			
-			optionButton.setBounds(450, 450, 100, 100);
-			optionButton.setForeground(Color.WHITE);
-			optionButton.setFont(new Font("맑은 고딕", 0, 16));
-			optionButton.setBorderPainted(false);
-			optionButton.setContentAreaFilled(false);
-			optionButton.setFocusPainted(false);
-			optionButton.setOpaque(true);
-			optionButton.setBackground(SystemColor.textHighlight);
-			optionButton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					changeScreen(ScreenType.Option);
-				}
-			});
-			
 
 			QR_label.setBounds(650, 450, 100, 100);
 			QR_label.setIcon(new ImageIcon(qrcode));
@@ -672,6 +699,83 @@ public class LocalLink extends JFrame {
 			File_title.setHorizontalAlignment(SwingConstants.CENTER);
 			
 			File_panel.setBounds(50, 300, 325, 100);
+			File_panel.setBorder(null);
+			File_panel.setVisible(true);
+			File_panel.setBackground(new Color(0,0,0,100));
+			File_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			File_panel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+			File_panel.getVerticalScrollBar().setBackground(new Color(200, 200, 200, 100));
+			File_panel.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+
+				@Override
+				protected JButton createDecreaseButton(int orientation) {
+					return createZeroButton();
+				}
+
+				@Override
+				protected JButton createIncreaseButton(int orientation) {
+					return createZeroButton();
+				}
+
+				@Override
+				protected void configureScrollBarColors() {
+					this.thumbColor = new Color(200, 200, 200, 50);
+					this.minimumThumbSize = new Dimension(0, 50);
+					this.maximumThumbSize = new Dimension(0, 50);
+					this.thumbDarkShadowColor = new Color(200, 200, 200);
+				}
+
+				private JButton createZeroButton() {
+					JButton jbutton = new JButton();
+					jbutton.setPreferredSize(new Dimension(0, 0));
+					jbutton.setMinimumSize(new Dimension(0, 0));
+					jbutton.setMaximumSize(new Dimension(0, 0));
+					return jbutton;
+				}
+
+			});
+
+			File_area.setBackground(new Color(0, 0, 0, 0));
+			File_area.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			File_area.setForeground(Color.white);
+			File_area.setEditable(false);
+			File_area.setSelectionColor(new Color(0, 0, 0, 125));
+			File_area.setSelectedTextColor(Color.WHITE);
+			
+			connect_scroll.setBounds(175, 175, 200, 250);
+			connect_scroll.setBackground(Color.DARK_GRAY);
+			connect_scroll.setBorder(null);
+			connect_scroll.getVerticalScrollBar().setUnitIncrement(7);
+			connect_scroll.getVerticalScrollBar().setBackground(new Color(0, 0, 0, 100));
+			connect_scroll.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
+
+				@Override
+				protected JButton createDecreaseButton(int orientation) {
+					return createZeroButton();
+				}
+
+				@Override
+				protected JButton createIncreaseButton(int orientation) {
+					return createZeroButton();
+				}
+
+				@Override
+				protected void configureScrollBarColors() {
+					this.thumbColor = new Color(200, 200, 200, 50);
+					this.minimumThumbSize = new Dimension(0, 50);
+					this.maximumThumbSize = new Dimension(0, 50);
+					this.thumbDarkShadowColor = new Color(200, 200, 200);
+				}
+
+				private JButton createZeroButton() {
+					JButton jbutton = new JButton();
+					jbutton.setPreferredSize(new Dimension(0, 0));
+					jbutton.setMinimumSize(new Dimension(0, 0));
+					jbutton.setMaximumSize(new Dimension(0, 0));
+					return jbutton;
+				}
+
+			});
 			
 			Chat_title.setBounds(50, 415, 325, 25);
 			Chat_title.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
@@ -679,7 +783,48 @@ public class LocalLink extends JFrame {
 			Chat_title.setHorizontalAlignment(SwingConstants.CENTER);
 			
 			Chat_panel.setBounds(50, 450, 325, 100);
+			Chat_panel.setBorder(null);
+			Chat_panel.setVisible(true);
+			Chat_panel.setBackground(new Color(0,0,0,100));
+			Chat_panel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+			Chat_panel.getVerticalScrollBar().setBackground(new Color(200, 200, 200, 100));
+			Chat_panel.getVerticalScrollBar().setUI(new BasicScrollBarUI() {
 
+				@Override
+				protected JButton createDecreaseButton(int orientation) {
+					return createZeroButton();
+				}
+
+				@Override
+				protected JButton createIncreaseButton(int orientation) {
+					return createZeroButton();
+				}
+
+				@Override
+				protected void configureScrollBarColors() {
+					this.thumbColor = new Color(200, 200, 200, 50);
+					this.minimumThumbSize = new Dimension(0, 50);
+					this.maximumThumbSize = new Dimension(0, 50);
+					this.thumbDarkShadowColor = new Color(200, 200, 200);
+				}
+
+				private JButton createZeroButton() {
+					JButton jbutton = new JButton();
+					jbutton.setPreferredSize(new Dimension(0, 0));
+					jbutton.setMinimumSize(new Dimension(0, 0));
+					jbutton.setMaximumSize(new Dimension(0, 0));
+					return jbutton;
+				}
+
+			});
+
+			Chat_area.setBackground(new Color(0, 0, 0, 0));
+			Chat_area.setFont(new Font("맑은 고딕", Font.PLAIN, 16));
+			Chat_area.setForeground(Color.white);
+			Chat_area.setEditable(false);
+			Chat_area.setSelectionColor(new Color(0, 0, 0, 125));
+			Chat_area.setSelectedTextColor(Color.WHITE);
+			
 			connect_scroll.setBounds(175, 175, 200, 250);
 			connect_scroll.setBackground(Color.DARK_GRAY);
 			connect_scroll.setBorder(null);
@@ -754,7 +899,7 @@ public class LocalLink extends JFrame {
 			for(int i = 0; i < list.size(); i++) {
 				if(i == 0) {
 					main_recent_1.setText(list.get(i).title);
-					main_recent_artwork_1.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_FAST)));
+					main_recent_artwork_1.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING)));
 					main_recent_artwork_1.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
@@ -765,7 +910,7 @@ public class LocalLink extends JFrame {
 				}
 				if(i == 1) {
 					main_recent_2.setText(list.get(i).title);
-					main_recent_artwork_2.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_FAST)));
+					main_recent_artwork_2.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING)));
 					main_recent_artwork_2.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
@@ -776,7 +921,7 @@ public class LocalLink extends JFrame {
 				}
 				if(i == 2) {
 					main_recent_3.setText(list.get(i).title);
-					main_recent_artwork_3.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_FAST)));
+					main_recent_artwork_3.setIcon(new ImageIcon(list.get(i).image.getScaledInstance(100, 100, Image.SCALE_AREA_AVERAGING)));
 					main_recent_artwork_3.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseClicked(MouseEvent e) {
@@ -814,7 +959,6 @@ public class LocalLink extends JFrame {
 			add(main_recent_2);
 			add(main_recent_artwork_3);
 			add(main_recent_3);
-			add(optionButton);
 			add(QR_label);
 			add(File_panel);
 			add(File_title);
@@ -859,22 +1003,22 @@ public class LocalLink extends JFrame {
 			});
 			menu.add(volumebar);
 
-			btnOption.setBounds(150, 545, 50, 25);
-			btnOption.setForeground(Color.WHITE);
-			btnOption.setFont(new Font("맑은 고딕", 0, 16));
-			btnOption.setContentAreaFilled(false);
-			btnOption.setFocusPainted(false);
-			btnOption.setOpaque(true);
-			btnOption.setBorderPainted(true);
-			btnOption.setBorder(new LineBorder(Color.white));
-			btnOption.setBackground(new Color(0, 0, 0, 0));
-			btnOption.setText("V");
-			btnOption.addActionListener(new ActionListener() {
+			VolButton.setBounds(150, 545, 50, 25);
+			VolButton.setForeground(Color.WHITE);
+			VolButton.setFont(new Font("맑은 고딕", 0, 16));
+			VolButton.setContentAreaFilled(false);
+			VolButton.setFocusPainted(false);
+			VolButton.setOpaque(true);
+			VolButton.setBorderPainted(true);
+			VolButton.setBorder(new LineBorder(Color.white));
+			VolButton.setBackground(new Color(0, 0, 0, 0));
+			VolButton.setText("V");
+			VolButton.addActionListener(new ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					menu.show(btnOption, -1 - volumebar.getPreferredSize().width,
-							-5 + btnOption.getHeight() - volumebar.getPreferredSize().height);
+					menu.show(VolButton, -1 - volumebar.getPreferredSize().width,
+							-5 + VolButton.getHeight() - volumebar.getPreferredSize().height);
 				}
 			});
 
@@ -1037,7 +1181,7 @@ public class LocalLink extends JFrame {
 			add(playButton);
 			add(backButton);
 			add(nextButton);
-			add(btnOption);
+			add(VolButton);
 		}
 	}
 }
