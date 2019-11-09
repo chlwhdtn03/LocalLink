@@ -92,6 +92,8 @@ public class PlayListManager {
 	public static List<Track> loadHeader() {
 		List<Track> tracklist = new ArrayList<Track>();
 		try {
+			if(file[0].exists() == false)
+				return tracklist;
 			BufferedReader br1 = new BufferedReader(new FileReader(file[0]));
 			tracklist.add(new Track(br1.readLine()));
 			br1.close();			
